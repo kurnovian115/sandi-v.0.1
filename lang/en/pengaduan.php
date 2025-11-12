@@ -1,0 +1,27 @@
+<?php
+return [
+    'title' => 'Public Complaint Form',
+    'desc' => 'Please fill out the form completely. Attach supporting files (photo) if available.',
+    'reporter_name' => 'Reporter Name',
+    'contact' => 'Phone',
+    'email' => 'Email',
+    'category' => 'Complaint Category',
+    'service' => 'Service Type',
+    'subject' => 'Complaint Title',
+    'description' => 'Complaint Description',
+    'submit' => 'Submit Complaint',
+    'cancel' => 'Cancel',
+    'select' => '-- Select --',
+    'office_imigration' => 'Immigration Office',
+    'select_upt' => 'Select Immigration Office',
+    'full_name' => 'Full Name',
+    'contact_name' => 'Handphone',
+    'email_name' =>'Email',
+    'ringkas' => 'Problem summary (max 100 characters)',
+    'attach_evidence' => 'Attach Evidence (Photo)',
+    'choose_file' => 'Choose File',
+    'no_file_chosen' => 'No file chosen',
+    'reset' => 'Reset',
+    'thanks_ticket' => 'Thank you. Your complaint has been recorded. Ticket No.: :ticket',
+    
+];

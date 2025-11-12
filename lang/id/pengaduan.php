@@ -1,0 +1,28 @@
+<?php
+return [
+    'title' => 'Form Pengaduan Masyarakat',
+    'desc' => 'Isi form berikut dengan data lengkap. Lampirkan bukti (foto) bila ada.',
+    'reporter_name' => 'Nama Pelapor',
+    'contact' => 'No. Handphone',
+    'email' => 'Email',
+    'category' => 'Kategori Pengaduan',
+    'service' => 'Jenis Layanan',
+    'subject' => 'Judul Pengaduan',
+    'description' => 'Deskripsi Pengaduan',
+    'submit' => 'Kirim Pengaduan',
+    'cancel' => 'Batal',
+    'select' => '-- Pilih --',
+    'reporter_name' => 'Nama Pelapor',
+    'office_imigration' => 'Kantor Imigrasi',
+    'select_upt' => 'Pilih Kantor Imigrasi',
+    'full_name' => 'Nama lengkap',
+    'contact_name' => 'Handphone',
+    'email_name' => 'Email',
+    'ringkas' => 'Ringkasan masalah (maks 100 karakter)',
+    'attach_evidence' => 'Lampirkan Bukti (foto)',
+    'choose_file' => 'Pilih File',
+    'no_file_chosen' => 'Tidak ada file yang dipilih',
+    'reset' => 'Reset',
+
+    'thanks_ticket' => 'Terima kasih. Pengaduan Anda telah terekam. Nomor Tiket: :ticket',
+];
