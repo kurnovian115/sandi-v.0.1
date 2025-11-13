@@ -26,7 +26,7 @@ class KategoriPengaduanController extends Controller
             $query->where('is_active', $is_active == '1' ? 1 : 0);
         }
 
-        $list = $query->orderBy('nama')->paginate(12)->withQueryString();
+        $list = $query->orderBy('nama')->paginate(7)->withQueryString();
 
         return view('kategori-pengaduan.index', [
             'title' => 'Kategori Pengaduan',

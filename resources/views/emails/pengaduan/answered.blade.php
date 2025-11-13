@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>Notifikasi Pengaduan - SANDI JABAR</title>
+    <title>Pembaharuan Pengaduan - {{ config('app.name') }}</title>
     <style>
         body {
             background: #eef6fa;
@@ -103,51 +103,36 @@
     <div class="email-wrap">
         {{-- Header --}}
         <div class="header">
-            {{-- <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }} Logo" class="logo" /> --}}
-            {{-- <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png"> --}}
             <img src="{{ $message->embed(public_path('images/logo.png')) }}" alt="{{ config('app.name') }} logo"
                 class="logo">
             <div style="padding-left: 4px;">
                 <div class="brand">SANDI JABAR</div>
-                <div class="muted" style="font-size:12px; margin-top:2px;">Notifikasi Pengaduan</div>
+                <div class="muted" style="font-size:12px; margin-top:2px;">Pembaharuan Pengaduan</div>
             </div>
         </div>
 
         {{-- Body --}}
         <div class="body">
-            <h2 style="margin:0 0 10px 0;">Pengaduan Anda Telah Diterima</h2>
+            <h2 style="margin:0 0 10px 0;">Pengaduan Telah Selesai</h2>
 
             <p class="muted">Yth. {{ $pengaduan->pelapor_nama ?? 'Bapak/Ibu' }},</p>
 
             <p>
-                Terima kasih telah menggunakan layanan <strong>{{ config('app.name') }}</strong>.
-                Pengaduan Anda telah berhasil kami terima dan tercatat dalam sistem. Berikut informasi singkat terkait
-                pengaduan Anda:
+                Kami informasikan bahwa pengaduan Anda telah selesai ditangani oleh tim kami. Berikut ringkasan hasil
+                penyelesaian:
             </p>
 
-            {{-- Nomor tiket (tengah) --}}
-            {{-- Tiket Section --}}
+            {{-- Nomor tiket --}}
             <div style="text-align:center; margin:20px 0;">
                 <div
-                    style="
-        display:inline-block;
-        padding:16px 22px;
-        border-radius:10px;
-        font-size:20px;
-        font-weight:700;
-        background:linear-gradient(135deg,#dbeafe,#bfdbfe);
-        color:#0f172a;
-        box-shadow:0 1px 4px rgba(0,0,0,0.08);
-        margin-bottom:10px;
-    ">
+                    style="display:inline-block;padding:16px 22px;border-radius:10px;font-size:20px;font-weight:700;background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#0f172a;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin-bottom:10px;">
                     {{ $pengaduan->no_tiket }}
                 </div>
             </div>
 
-
             {{-- Status badge --}}
             @php
-                $status = strtolower($pengaduan->status ?? 'menunggu');
+                $status = strtolower($pengaduan->status ?? 'selesai');
                 $color = '#6b7280';
                 if (str_contains($status, 'menunggu')) {
                     $color = '#f59e0b';
@@ -155,13 +140,15 @@
                 if (str_contains($status, 'disposisi') || str_contains($status, 'proses')) {
                     $color = '#0ea5a6';
                 }
-                if (str_contains($status, 'selesai')) {
+                if (str_contains($status, 'selesai') || str_contains($status, 'closed')) {
                     $color = '#10b981';
+                }
+                if (str_contains($status, 'ditolak') || str_contains($status, 'rejected')) {
+                    $color = '#ef4444';
                 }
             @endphp
 
             <div style="text-align:left; margin:12px 0 18px;">
-
                 <span class="status-badge" style="background:{{ $color }};">
                     Status : {{ ucfirst($pengaduan->status) }}
                 </span>
@@ -175,28 +162,36 @@
                 <li><strong>No. Kontak Pelapor:</strong> {{ $pengaduan->pelapor_contact }}</li>
             </ul>
 
-            <p>
-                Untuk memantau perkembangan penanganan pengaduan, silakan gunakan tombol berikut.
-                Pastikan Anda menyimpan nomor tiket sebagai bukti dan referensi pelacakan.
-            </p>
-
-            {{-- Tombol (tengah) --}}
-            <div style="text-align:center; margin:20px 0;">
-                {{-- <a href="{{ url('/pengaduan/track?q=' . $ticket) }}" --}}
-                <a class="btn" href="{{ url('/pengaduan/track?q=' . $pengaduan->no_tiket) }}">Lacak Pengaduan</a>
+            {{-- Hasil tindak lanjut --}}
+            <h4 style="margin:8px 0 6px 0;">Hasil Tindak Lanjut</h4>
+            <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;color:#111827;">
+                {!! nl2br(e($pengaduan->hasil_tindaklanjut ?? '-')) !!}
             </div>
 
-            <p class="muted" style="text-align:center;">
+            @if (!empty($pengaduan->dokumen_penyelesaian))
+                <p>
+                    Dokumen penyelesaian telah tersedia pada sistem. Untuk mengunduh atau melihat dokumen, silakan
+                    kunjungi halaman detail.
+                </p>
+            @endif
+
+            {{-- Tombol (tengah) --}}
+            {{-- <div style="text-align:center; margin:20px 0;">
+                <a class="btn" href="{{ url('/pengaduan/track?q=' . $pengaduan->no_tiket) }}">Lihat Detail &
+                    Unduh</a>
+            </div> --}}
+
+            {{-- <p class="muted" style="text-align:center;">
                 Atau buka: <a href="{{ url('/pengaduan/track') }}">{{ url('/pengaduan/track') }}</a>
-            </p>
+            </p> --}}
 
             <p style="margin-top:20px;">
-                Terima kasih atas kepercayaan Anda dalam membantu kami meningkatkan kualitas layanan.
+                Terima kasih atas kepercayaan Anda.
             </p>
 
             <p style="margin-top:16px;">
                 Salam hormat,<br>
-                <strong>{{ config('app.name') }}</strong>
+                <strong>Sandi Jabar</strong>
             </p>
         </div>
     </div>

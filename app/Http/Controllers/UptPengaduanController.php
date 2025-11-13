@@ -73,7 +73,7 @@ public function index(Request $request)
             DB::raw('admin.name as admin_nama'),
             DB::raw('pl.first_assign_at as disposisi_at'),
         ])
-        ->paginate(20)
+        ->paginate(7)
         ->withQueryString();
 
     return view('upt.pengaduan.index', compact(

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Log;
+
 use App\Models\Unit;
 use App\Models\Pengaduan;
 use Illuminate\Support\Str;
@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StorePengaduanRequest;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TicketCreatedMail;
+use Illuminate\Support\Facades\Log;
 
 class PengaduanController extends Controller
 {
@@ -73,7 +74,7 @@ class PengaduanController extends Controller
             $query->whereDate('created_at', '<=', $to);
         }
 
-        $pengaduans = $query->latest('id')->paginate(15)->withQueryString();
+        $pengaduans = $query->latest('id')->paginate(7)->withQueryString();
 
         // Data dropdown
         $units = $lockedUnit ? collect([$lockedUnit]) : Unit::orderBy('name')->get(['id','name']);
@@ -94,8 +95,7 @@ class PengaduanController extends Controller
    public function index(Request $request)
     {
         $query = Pengaduan::query()
-        ->with(['unit', 'kategori', 'jenisLayanan', 'latestLog']);
-
+            ->with(['unit', 'kategori', 'jenisLayanan', 'latestLog']);
 
         // Pencarian umum
         if ($search = trim((string) $request->get('q'))) {
@@ -107,30 +107,29 @@ class PengaduanController extends Controller
         });
         }
 
-
         // Filter
         if ($unitId = $request->integer('unit_id')) {
-        $query->where('unit_id', $unitId);
+            $query->where('unit_id', $unitId);
         }
         if ($layananId = $request->integer('jenis_layanan_id')) {
-        $query->where('jenis_layanan_id', $layananId);
+            $query->where('jenis_layanan_id', $layananId);
         }
         if ($status = trim((string) $request->get('status'))) {
-        $query->where('status', $status);
+            $query->where('status', $status);
         }
         if ($asal = trim((string) $request->get('asal_pengaduan'))) {
-        $query->where('asal_pengaduan', $asal);
+            $query->where('asal_pengaduan', $asal);
         }
         // Rentang tanggal dibuat
         if ($from = $request->date('from')) {
-        $query->whereDate('created_at', '>=', $from);
+            $query->whereDate('created_at', '>=', $from);
         }
         if ($to = $request->date('to')) {
-        $query->whereDate('created_at', '<=', $to);
+            $query->whereDate('created_at', '<=', $to);
         }
 
 
-        $pengaduans = $query->latest('id')->paginate(15)->withQueryString();
+        $pengaduans = $query->latest('id')->paginate(7)->withQueryString();
 
 
         $units = Unit::query()->orderBy('name')->get(['id','name']);
@@ -183,24 +182,106 @@ class PengaduanController extends Controller
         return view('pengaduan.tambah', compact('kategoris', 'layanans', 'source', 'upt'));
     }
 
+    // public function store(StorePengaduanRequest $request)
+    // {
+    //     $validated = $request->validate([
+    //             'upt_id' => ['required', 'exists:units,id'],
+    //             'kategori_id' => ['required', 'exists:kategori_pengaduan,id'],
+    //             'jenis_layanan_id' => ['required', 'exists:jenis_layanan,id'],
+    //             'judul' => ['required','string','max:100'],
+    //             'deskripsi' => ['required','string'],
+    //             'pelapor_nama' => ['required','string','max:191'],
+    //             'pelapor_contact' =>  ['required','string','max:20','regex:/^(?:\+?62|0)\d{8,13}$/'],
+    //             'email'           => ['required','email','max:150'],
+    //         ]);
+
+    //     // Map upt_id (dari frontend) ke unit_id (kolom DB)
+    //     $validated['unit_id'] = $validated['upt_id'];
+    //     unset($validated['upt_id']);
+
+    //     DB::beginTransaction();
+    //     try {
+    //         // generate tiket
+    //         $noTiket = 'IMI-JBR-' . now()->format('YmdHis') . strtoupper(Str::random(3));
+
+    //         $data = $validated;
+    //         $data['no_tiket'] = $noTiket;
+    //         $data['status'] = 'Menunggu';
+    //         $data['sla_late'] = 0;
+
+    //         // handle files
+    //         $buktiArray = [];
+    //         if ($request->hasFile('bukti_masyarakat')) {
+    //             foreach ($request->file('bukti_masyarakat') as $f) {
+    //                 $path = $f->store('pengaduan/bukti/' . date('Ymd'), 'public');
+    //                 $buktiArray[] = [
+    //                     'path' => $path,
+    //                     'name' => $f->getClientOriginalName(),
+    //                     'mime' => $f->getClientMimeType(),
+    //                     'size' => $f->getSize(),
+    //                 ];
+    //             }
+    //         }
+    //         $data['bukti_masyarakat'] = $buktiArray ?: null;
+
+    //         $pengaduan = Pengaduan::create($data);
+
+    //         // buat initial log (pelapor publik => user_id null)
+    //         PengaduanLog::create([
+    //             'pengaduan_id' => $pengaduan->id,
+    //             'user_id' => null,
+    //             'type' => 'create',
+    //             'status_after' => $pengaduan->status,
+    //             'note' => 'Pengaduan dibuat oleh masyarakat publik / Complaints are made by the public.',
+    //             'meta' => [
+    //                 'pelapor_nama' => $pengaduan->pelapor_nama ?? null,
+    //                 'pelapor_contact' => $pengaduan->pelapor_contact ?? null,
+    //             ],
+    //         ]);
+
+    //         // DB::commit();
+    //         DB::commit();
+
+    //         // dd($pengaduan->email);
+    //     // try {
+    //     if (!empty($pengaduan->email)) {
+    //         // Mail::to($pengaduan->email)->send(new TicketCreatedMail($pengaduan));
+    //         Mail::to($pengaduan->email)->send(new TicketCreatedMail($pengaduan));
+    //     }
+ 
+    //     return redirect()->route('pengaduan.create')
+    //         ->with([
+    //             'ticket' => $noTiket,
+    //             'email'  => $pengaduan->email,
+    //             'success_message' => true, // flag penanda
+    //         ]);
+
+
+    //     // return redirect()->route('pengaduan.create')
+    //     //     ->with('ok', __('pengaduan.thanks_ticket', ['ticket' => '<span class="text-red-600 font-bold">'.e($noTiket).'</span>']));
+    //         // return redirect()->route('pengaduan.create')
+    //         //     ->with('ok', __('pengaduan.thanks_ticket', ['ticket' => '<span class="text-red-600 font-bold">'.e($noTiket).'</span>']));
+    //             // ->with('success', 'Pengaduan Berhasil Dikirim.');
+    //     } catch (\Throwable $e) {
+    //         DB::rollBack();     
+    //         return back()->withInput()->withErrors(['internal' => 'Terjadi kesalahan. Silakan ulangi.']);
+    //         //         return back()->withInput()->withErrors([
+    //         //     'internal' => $e->getMessage()   // 👈 tampilkan error asli di UI
+    //         // ]);
+    //     }
+    // }
+
     public function store(StorePengaduanRequest $request)
     {
-        $validated = $request->validate([
-                'upt_id' => ['required', 'exists:units,id'],
-                'kategori_id' => ['required', 'exists:kategori_pengaduan,id'],
-                'jenis_layanan_id' => ['required', 'exists:jenis_layanan,id'],
-                'judul' => ['required','string','max:100'],
-                'deskripsi' => ['required','string'],
-                'pelapor_nama' => ['required','string','max:191'],
-                'pelapor_contact' =>  ['required','string','max:20','regex:/^(?:\+?62|0)\d{8,13}$/'],
-                'email'           => ['required','email','max:150'],
-            ]);
+        // gunakan validated() dari StorePengaduanRequest
+        $validated = $request->validated();
 
-        // Map upt_id (dari frontend) ke unit_id (kolom DB)
-        $validated['unit_id'] = $validated['upt_id'];
+        // Map upt_id -> unit_id
+        $validated['unit_id'] = $validated['upt_id'] ?? null;
         unset($validated['upt_id']);
 
         DB::beginTransaction();
+
         try {
             // generate tiket
             $noTiket = 'IMI-JBR-' . now()->format('YmdHis') . strtoupper(Str::random(3));
@@ -210,10 +291,12 @@ class PengaduanController extends Controller
             $data['status'] = 'Menunggu';
             $data['sla_late'] = 0;
 
-            // handle files
+            // handle files (safely)
             $buktiArray = [];
             if ($request->hasFile('bukti_masyarakat')) {
                 foreach ($request->file('bukti_masyarakat') as $f) {
+                    // optional: cek isValid()
+                    if (! $f->isValid()) continue;
                     $path = $f->store('pengaduan/bukti/' . date('Ymd'), 'public');
                     $buktiArray[] = [
                         'path' => $path,
@@ -225,9 +308,10 @@ class PengaduanController extends Controller
             }
             $data['bukti_masyarakat'] = $buktiArray ?: null;
 
+            // create pengaduan
             $pengaduan = Pengaduan::create($data);
 
-            // buat initial log (pelapor publik => user_id null)
+            // initial log
             PengaduanLog::create([
                 'pengaduan_id' => $pengaduan->id,
                 'user_id' => null,
@@ -240,32 +324,53 @@ class PengaduanController extends Controller
                 ],
             ]);
 
-            // DB::commit();
             DB::commit();
 
-            // dd($pengaduan->email);
-    // try {
-        if (!empty($pengaduan->email)) {
-            // Mail::to($pengaduan->email)->send(new TicketCreatedMail($pengaduan));
-            Mail::to($pengaduan->email)->send(new TicketCreatedMail($pengaduan));
-        }
- 
-        return redirect()->route('pengaduan.create')
-            ->with('ok', __('pengaduan.thanks_ticket', ['ticket' => '<span class="text-red-600 font-bold">'.e($noTiket).'</span>']));
+            // --- Kirim email (TIDAK merollback DB jika gagal)
+            if (!empty($pengaduan->email)) {
+                try {
+                    // Prefer queue in production:
+                    // Mail::to($pengaduan->email)->queue(new TicketCreatedMail($pengaduan));
 
+                    // If you do not use queue, use send() but wrap with try/catch:
+                    Mail::to($pengaduan->email)->send(new TicketCreatedMail($pengaduan));
+                    Log::info('Ticket email sent', ['pengaduan_id' => $pengaduan->id, 'email' => $pengaduan->email]);
+                } catch (\Throwable $mailEx) {
+                    // log error but DO NOT rollback DB
+                    Log::error('Failed to send ticket email', [
+                        'pengaduan_id' => $pengaduan->id,
+                        'email' => $pengaduan->email,
+                        'error' => $mailEx->getMessage(),
+                        'trace' => $mailEx->getTraceAsString(),
+                    ]);
+                    // optionally: notify admin, or push to a failed-mails table
+                }
+            }
 
-            // return redirect()->route('pengaduan.create')
-            //     ->with('ok', __('pengaduan.thanks_ticket', ['ticket' => '<span class="text-red-600 font-bold">'.e($noTiket).'</span>']));
-                // ->with('success', 'Pengaduan Berhasil Dikirim.');
+            // redirect with structured session (ticket + email)
+            return redirect()->route('pengaduan.create')->with([
+                'ticket' => $noTiket,
+                'email'  => $pengaduan->email,
+                'success_message' => true,
+            ]);
         } catch (\Throwable $e) {
             DB::rollBack();
-        
+
+            // log full error
+            Log::error('Failed to create pengaduan', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request' => [
+                    // avoid logging sensitive data
+                    'upt_id' => $request->input('upt_id'),
+                    'kategori_id' => $request->input('kategori_id'),
+                ],
+            ]);
+
             return back()->withInput()->withErrors(['internal' => 'Terjadi kesalahan. Silakan ulangi.']);
-            //         return back()->withInput()->withErrors([
-            //     'internal' => $e->getMessage()   // 👈 tampilkan error asli di UI
-            // ]);
         }
     }
+
     
     public function track(Request $request)
     {

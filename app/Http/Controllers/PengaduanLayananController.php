@@ -48,6 +48,10 @@ class PengaduanLayananController extends Controller
 
         // Filter tambahan (masih di dalam cakupan unit+layanan)
         if ($status = trim((string) $request->get('status'))) {
+            if ($status ==='Menunggu') {
+                $status ='Disposisi ke layanan';
+            };
+            // dd($status);
             $query->where('status', $status);
         }
         if ($asal = trim((string) $request->get('asal_pengaduan'))) {
@@ -61,7 +65,7 @@ class PengaduanLayananController extends Controller
         }
 
         // paginate
-        $pengaduans = $query->latest('id')->paginate(15)->withQueryString();
+        $pengaduans = $query->latest('id')->paginate(7)->withQueryString();
 
         // Data dropdown: karena kita mengunci unit & layanan, untuk unit tampilkan hanya unit user
         $lockedUnit = Unit::find($user->unit_id);

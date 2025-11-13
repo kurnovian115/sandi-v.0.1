@@ -16,7 +16,6 @@
 
 <body class="relative min-h-screen bg-gray-900 overflow-x-hidden">
 
-
     <!-- Background logo transparan + overlay gradasi putih lembut -->
     <div class="absolute inset-0 bg-linear-to-b from-white/90 via-white/95 to-white pointer-events-none">
 
@@ -52,9 +51,7 @@
     <main class="relative z-10 pt-24 pb-12">
         <div class="fixed left-2 bottom-0 pb-4 z-50">
             <a href="{{ url('/') }}" role="button"
-                class="inline-flex items-center gap-3 px-4 py-2.5 rounded-full shadow-xl
-               bg-gradient-to-r from-indigo-600 to-sky-500 text-white
-               hover:brightness-110 hover:scale-105 transition-transform">
+                class="inline-flex items-center gap-3 px-4 py-2.5 rounded-full shadow-xl bg-gradient-to-r from-indigo-600 to-sky-500 text-white hover:brightness-110 hover:scale-105 transition-transform">
 
                 <!-- Ikon selalu muncul -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 16 16"
@@ -99,11 +96,76 @@
                             {{ session('ok') }}</div>
                     @endif --}}
 
-                    @if (session('ok'))
+                    {{-- @if (session('ok'))
                         <div class="rounded-md bg-emerald-50 border border-emerald-200 p-3 text-emerald-800 mb-4">
-                            {!! session('ok') !!} {{-- optional inline fallback --}}
+                            {!! session('ok') !!} {{-- optional inline fallback 
+                        </div>
+                    @endif --}}
+
+                    @if (session('ticket'))
+                        @php
+                            $ticket = session('ticket');
+                            $email = session('email');
+                            $isId = app()->getLocale() === 'id';
+                        @endphp
+
+                        <div class="rounded-md border border-emerald-300 bg-emerald-50 p-4 mb-4 text-emerald-800">
+
+                            {{-- Judul --}}
+                            <div class="font-semibold">
+                                @if ($isId)
+                                    Terima kasih! Pengaduan Anda telah terekam.
+                                @else
+                                    Thank you! Your complaint has been successfully recorded.
+                                @endif
+                            </div>
+
+                            {{-- Label Nomor Tiket --}}
+                            <div class="mt-2 text-sm">
+                                @if ($isId)
+                                    Nomor Tiket Anda:
+                                @else
+                                    Your Ticket Number:
+                                @endif
+                            </div>
+
+                            {{-- Ticket Box + Button --}}
+                            <div class="mt-2 flex items-center gap-2 flex-wrap">
+                                <div id="ticket-box"
+                                    class="bg-emerald-200 text-emerald-800 px-4 py-2 rounded-lg font-bold text-lg">
+                                    {{ $ticket }}
+                                </div>
+
+                                <a href="{{ url('/pengaduan/track?q=' . $ticket) }}"
+                                    class="bg-gray-900 hover:bg-black text-white px-3 py-2 rounded-lg font-semibold">
+                                    @if ($isId)
+                                        Lacak Pengaduan
+                                    @else
+                                        Track Complaint
+                                    @endif
+                                </a>
+                            </div>
+
+                            {{-- Paragraf Informasi --}}
+                            <p class="mt-3 text-sm leading-relaxed">
+                                @if ($isId)
+                                    Salinan nomor tiket juga telah kami kirimkan ke alamat email
+                                    <strong>{{ $email }}</strong>.
+                                    Anda akan menerima pemberitahuan otomatis melalui email setiap kali
+                                    terdapat pembaruan status terkait pengaduan Anda.
+                                    Harap simpan nomor tiket ini sebagai referensi pelacakan di kemudian hari.
+                                @else
+                                    A copy of your ticket number has also been sent to your email:
+                                    <strong>{{ $email }}</strong>.
+                                    You will automatically receive email notifications whenever there are updates
+                                    regarding the status of your complaint.
+                                    Please keep this ticket number for future tracking purposes.
+                                @endif
+                            </p>
+
                         </div>
                     @endif
+
 
                     {{-- <input type="hidden" name="asal_pengaduan" value="{{ $source ?? 'qr' }}"> --}}
 

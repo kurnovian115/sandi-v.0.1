@@ -20,79 +20,101 @@
             {{-- FILTER BAR --}}
             <div class="px-6 py-4 border-b border-slate-200 bg-white">
                 <form method="GET"
-                    class="max-w-5xl mx-auto flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:justify-center lg:gap-2">
+                    class="max-w-5xl mx-auto flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-center">
+                    {{-- ROW 1: Search + UPT + Status + Layanan --}}
+                    <div class="w-full flex flex-col lg:flex-row lg:flex-wrap gap-3">
 
-                    {{-- Search --}}
-                    <div class="w-full lg:w-auto lg:flex lg:items-stretch gap-0">
-                        <input type="text" name="q" value="{{ request('q') }}"
-                            placeholder="Cari tiket / judul / pelapor"
-                            class="w-full rounded-lg lg:rounded-l-lg lg:rounded-r-none border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        {{-- Search --}}
+                        <div class="w-full lg:w-auto lg:flex lg:items-stretch gap-0">
+                            <input type="text" name="q" value="{{ request('q') }}"
+                                placeholder="Cari tiket / judul / pelapor"
+                                class="w-full rounded-lg lg:rounded-l-lg lg:rounded-r-none border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500">
+
+                            <button type="submit"
+                                class="cursor-pointer mt-2 w-full lg:mt-0 lg:w-auto flex items-center justify-center gap-2 rounded-lg lg:rounded-r-lg lg:rounded-l-none bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 text-sm font-medium">
+                                <i class="bi bi-search"></i>
+                                <span>Cari</span>
+                            </button>
+                        </div>
+
+                        {{-- Filter UPT --}}
+                        @if (!empty($lockedUnit))
+                            <input type="hidden" name="unit_id" value="{{ $lockedUnit->id }}">
+                            <div class="w-full lg:w-auto">
+                                <span
+                                    class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-300 text-sm bg-slate-50">
+                                    <i class="bi bi-building"></i>
+                                    UPT: <b>{{ $lockedUnit->name }}</b>
+                                </span>
+                            </div>
+                        @else
+                            <div class="relative w-full lg:w-64">
+                                <select name="unit_id"
+                                    class="w-full appearance-none rounded-lg border border-slate-300 px-3 pr-9 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="">Semua UPT</option>
+                                    @foreach ($units as $u)
+                                        <option value="{{ $u->id }}" @selected(request('unit_id') == $u->id)>
+                                            {{ $u->name }}</option>
+                                    @endforeach
+                                </select>
+                                <i
+                                    class="bi bi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                            </div>
+                        @endif
+
+                        {{-- Filter Status --}}
+                        <select name="status"
+                            class="text-sm w-full lg:w-44 rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 px-3 py-2">
+                            <option value="">Semua Status</option>
+                            @foreach (['Menunggu', 'Selesai'] as $s)
+                                <option value="{{ $s }}" @selected(request('status') == $s)>
+                                    {{ ucfirst($s) }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        {{-- Filter layanan --}}
+                        <select name="jenis_layanan_id"
+                            class="text-sm w-full lg:w-44 rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 px-3 py-2">
+                            <option value="">Semua Layanan</option>
+                            @foreach ($jenisLayanans as $jl)
+                                <option value="{{ $jl->id }}" @selected(request('jenis_layanan_id') == $jl->id)>{{ $jl->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                    </div>
+
+                    {{-- ROW 2: Date + Buttons --}}
+                    <div class="w-full flex flex-col lg:flex-row items-center lg:items-end gap-3 mt-1">
+
+                        {{-- Tanggal From --}}
+                        <div class="w-full lg:w-44">
+                            <input type="date" name="from" value="{{ request('from') }}"
+                                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        </div>
+
+                        {{-- Tanggal To --}}
+                        <div class="w-full lg:w-44">
+                            <input type="date" name="to" value="{{ request('to') }}"
+                                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        </div>
+
+                        {{-- Button Terapkan --}}
                         <button type="submit"
-                            class="cursor-pointer mt-2 w-full lg:mt-0 lg:w-auto flex items-center justify-center gap-2 rounded-lg lg:rounded-r-lg lg:rounded-l-none bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 text-sm font-medium">
-                            <i class="bi bi-search"></i>
-                            <span>Cari</span>
+                            class="cursor-pointer w-full lg:w-auto inline-flex items-center justify-center gap-1 rounded-lg bg-sky-600 hover:bg-sky-700 text-white px-3 py-2 text-sm">
+                            <i class="bi bi-funnel"></i> Terapkan
                         </button>
+
+                        {{-- Button Reset --}}
+                        <a href="{{ route('layanan.pengaduan.index') }}"
+                            class="w-full lg:w-auto inline-flex items-center justify-center gap-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-2 text-sm">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset
+                        </a>
                     </div>
-
-                    {{-- Filter UPT --}}
-                    {{-- Filter UPT --}}
-                    @if (!empty($lockedUnit))
-                        {{-- Kunci ke UPT user login --}}
-                        <input type="hidden" name="unit_id" value="{{ $lockedUnit->id }}">
-                        <div class="w-full lg:w-auto">
-                            <span
-                                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-300 text-sm bg-slate-50">
-                                <i class="bi bi-building"></i>
-                                UPT: <b>{{ $lockedUnit->name }}</b>
-                            </span>
-                        </div>
-                    @else
-                        <div class="relative w-full lg:w-64">
-                            <select name="unit_id"
-                                class="w-full appearance-none rounded-lg border border-slate-300 px-3 pr-9 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="">Semua UPT</option>
-                                @foreach ($units as $u)
-                                    <option value="{{ $u->id }}" @selected(request('unit_id') == $u->id)>{{ $u->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <i
-                                class="bi bi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
-                        </div>
-                    @endif
-
-
-                    {{-- Filter Layanan --}}
-
-                    {{-- <div class="relative w-full lg:w-56">
-                       
-                        <i
-                            class="bi bi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
-                    </div> --}}
-
-                    {{-- Filter Status --}}
-
-                    <div class="relative w-full lg:w-44">
-                        <input type="date" name="from" value="{{ request('from') }}"
-                            class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                    </div>
-                    <div class="relative w-full lg:w-44">
-                        <input type="date" name="to" value="{{ request('to') }}"
-                            class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                    </div>
-
-                    {{-- Terapkan & Reset --}}
-                    </br>
-                    <button type="submit"
-                        class="cursor-pointer w-full lg:w-auto inline-flex items-center justify-center gap-1 rounded-lg bg-sky-600 hover:bg-sky-700 text-white px-3 py-2 text-sm">
-                        <i class="bi bi-funnel"></i> Terapkan
-                    </button>
-                    <a href="{{ route('layanan.pengaduan.index') }}"
-                        class="w-full lg:w-auto inline-flex items-center justify-center gap-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-2 text-sm">
-                        <i class="bi bi-arrow-counterclockwise"></i> Reset
-                    </a>
                 </form>
             </div>
+
 
             {{-- TABLE --}}
             <div class="px-6 py-4 bg-white">
@@ -137,15 +159,19 @@
                                         <div class="line-clamp-2">{{ $p->judul }}</div>
                                     </td>
                                     <td class="py-3 pr-3 text-xs">
-                                        <span
-                                            class="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-full border bg-amber-50 text-amber-700 border-amber-200">
-                                            <span class="h-1.5 w-1.5 rounded-full bg-current/60"></span>
-                                            {{-- @dd($row->status_label) --}}
-                                            @if ($p->status_label === 'Diproses oleh user layanan ')
+
+                                        {{-- @dd($row->status_label) --}}
+                                        @if ($p->status_label === 'Diproses oleh user layanan ')
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-full border bg-amber-50 text-amber-700 border-amber-200">
+                                                <span class="h-1.5 w-1.5 rounded-full bg-current/60"></span>
                                                 Menunggu
                                             @else
-                                                {{ $row->status_label }}
-                                            @endif
+                                                <span
+                                                    class="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200">
+                                                    <span class="h-1.5 w-1.5 rounded-full bg-current/60"></span>
+                                                    {{ $p->status_label }}
+                                        @endif
 
                                         </span>
                                     </td>

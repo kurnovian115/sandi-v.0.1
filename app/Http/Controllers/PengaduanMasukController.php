@@ -7,6 +7,9 @@ use App\Models\Pengaduan;
 use App\Models\PengaduanLog;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Log;
+use App\Mail\PengaduanAnsweredMail;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\UPT\JawabanStoreRequest;
 
 class PengaduanMasukController extends Controller
@@ -42,9 +45,43 @@ class PengaduanMasukController extends Controller
         return view('layanan.pengaduan.inbox.index', compact('items','userLayanan'));
     }
 
+    // public function jawab(JawabanStoreRequest $request, Pengaduan $pengaduan)
+    // {
+        
+    //     if (
+    //         optional($request->user()->role)->name !== 'admin_layanan' ||
+    //         (int) $request->user()->unit_id !== (int) $pengaduan->unit_id
+    //     ) {
+    //         abort(403);
+    //     }
+
+    //     $path = null;
+    //     if ($request->hasFile('dokumen_penyelesaian')) {
+    //         $path = $request->file('dokumen_penyelesaian')->store('pengaduan/dokumen','public');
+    //     }
+    //     $pengaduan->update([
+    //         'admin_upt_id' => $request->user()->id,
+    //         'hasil_tindaklanjut' => $request->hasil_tindaklanjut,
+    //         'petugas_nama' => $request->petugas_nama,
+    //         'dokumen_penyelesaian' => $path ?? $pengaduan->dokumen_penyelesaian,
+    //         'status' => Pengaduan::STATUS_SELESAI,
+    //         'tanggal_selesai' => now(),
+    //     ]);
+
+    //     PengaduanLog::create([
+    //         'pengaduan_id' => $pengaduan->id,
+    //         'user_id' => $request->user()->id,
+    //         'type' => 'jawab',
+    //         'status_after' => Pengaduan::STATUS_SELESAI,
+    //         'note' => 'Ditutup oleh admin UPT',
+    //         'meta' => null,
+    //     ]);
+
+    //     return back()->with('success', 'Pengaduan selesai dijawab.');
+    // }
+
     public function jawab(JawabanStoreRequest $request, Pengaduan $pengaduan)
     {
-        
         if (
             optional($request->user()->role)->name !== 'admin_layanan' ||
             (int) $request->user()->unit_id !== (int) $pengaduan->unit_id
@@ -56,6 +93,7 @@ class PengaduanMasukController extends Controller
         if ($request->hasFile('dokumen_penyelesaian')) {
             $path = $request->file('dokumen_penyelesaian')->store('pengaduan/dokumen','public');
         }
+
         $pengaduan->update([
             'admin_upt_id' => $request->user()->id,
             'hasil_tindaklanjut' => $request->hasil_tindaklanjut,
@@ -74,8 +112,35 @@ class PengaduanMasukController extends Controller
             'meta' => null,
         ]);
 
+        // KIRIM EMAIL NOTIFIKASI KE PELAPOR (jika email ada)
+        // dd($pengaduan->email);
+        try {
+            if (!empty($pengaduan->email)) {
+                // Jika ingin memakai queue: ->queue(new PengaduanAnsweredMail($pengaduan));
+                Mail::to($pengaduan->email)->send(new PengaduanAnsweredMail($pengaduan));
+
+                Log::info('Pengaduan answered email sent', [
+                    'pengaduan_id' => $pengaduan->id,
+                    'email' => $pengaduan->email,
+                ]);
+                
+            } else {
+                Log::info('Pengaduan answered: no email to send', ['pengaduan_id' => $pengaduan->id]);
+            }
+        } catch (\Throwable $mailEx) {
+            // log error, jangan ganggu UX petugas
+            Log::error('Failed sending answered email', [
+                'pengaduan_id' => $pengaduan->id,
+                'email' => $pengaduan->email,
+                'error' => $mailEx->getMessage(),
+            ]);
+            // optional: flash message to admin about mail fail (tidak wajib)
+            // session()->flash('warning', 'Notifikasi email gagal dikirim, silakan cek log.');
+        }
+
         return back()->with('success', 'Pengaduan selesai dijawab.');
     }
+
 
     public function show(Request $request, Pengaduan $pengaduan)
     {
