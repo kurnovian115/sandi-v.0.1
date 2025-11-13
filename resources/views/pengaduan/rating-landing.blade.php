@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Sandi Jabar — Nilai & Ulasan</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
 
     <style>
