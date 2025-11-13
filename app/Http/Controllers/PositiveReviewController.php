@@ -42,8 +42,8 @@ class PositiveReviewController extends Controller
 
             return redirect()
                 ->route('pengaduan.rating')
-                ->with('ok', 'Terima kasih atas ulasan positif Anda!');
-                // ->with('auto_redirect', url('/'));
+                ->with('success', 'Terima kasih atas ulasan positif Anda!')
+                ->with('auto_redirect', url('/'));
                 
 
         } catch (\Throwable $e) {
