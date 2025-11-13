@@ -13,7 +13,8 @@ use App\Models\KategoriPengaduan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StorePengaduanRequest;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TicketCreatedMail;
 
 class PengaduanController extends Controller
 {
@@ -184,26 +185,20 @@ class PengaduanController extends Controller
 
     public function store(StorePengaduanRequest $request)
     {
-    $validated = $request->validate([
-            'upt_id' => ['required', 'exists:units,id'],
-            'kategori_id' => ['required', 'exists:kategori_pengaduan,id'],
-            'jenis_layanan_id' => ['required', 'exists:jenis_layanan,id'],
-            // 'upt_id' => ['required', 'exists:upt_id,id'],
-            'judul' => ['required','string','max:100'],
-            'deskripsi' => ['required','string'],
-            'pelapor_nama' => ['required','string','max:191'],
-            'pelapor_contact' =>  ['required','string','max:20','regex:/^(?:\+?62|0)\d{8,13}$/'],
-            'email'           => ['required','email','max:150'],
-            // 'bukti_masyarakat.*' => ['nullable','file','mimes:jpg,jpeg,png','max:2048'],
-            // 'nama'            => ['required','string','max:100'],
-            // 'telepon'         => ['required','string','max:20','regex:/^(?:\+?62|0)\d{8,13}$/'],
-            // 'email'           => ['nullable','email','max:150'],
-        ]);
+        $validated = $request->validate([
+                'upt_id' => ['required', 'exists:units,id'],
+                'kategori_id' => ['required', 'exists:kategori_pengaduan,id'],
+                'jenis_layanan_id' => ['required', 'exists:jenis_layanan,id'],
+                'judul' => ['required','string','max:100'],
+                'deskripsi' => ['required','string'],
+                'pelapor_nama' => ['required','string','max:191'],
+                'pelapor_contact' =>  ['required','string','max:20','regex:/^(?:\+?62|0)\d{8,13}$/'],
+                'email'           => ['required','email','max:150'],
+            ]);
 
         // Map upt_id (dari frontend) ke unit_id (kolom DB)
         $validated['unit_id'] = $validated['upt_id'];
         unset($validated['upt_id']);
-
 
         DB::beginTransaction();
         try {
@@ -245,18 +240,32 @@ class PengaduanController extends Controller
                 ],
             ]);
 
+            // DB::commit();
             DB::commit();
 
-            return redirect()->route('pengaduan.create')
-                ->with('ok', __('pengaduan.thanks_ticket', ['ticket' => '<span class="text-red-600 font-bold">'.e($noTiket).'</span>']));
+            // dd($pengaduan->email);
+    // try {
+        if (!empty($pengaduan->email)) {
+            // Mail::to($pengaduan->email)->send(new TicketCreatedMail($pengaduan));
+            Mail::to($pengaduan->email)->send(new TicketCreatedMail($pengaduan));
+        }
+ 
+        return redirect()->route('pengaduan.create')
+            ->with('ok', __('pengaduan.thanks_ticket', ['ticket' => '<span class="text-red-600 font-bold">'.e($noTiket).'</span>']));
+
+
+            // return redirect()->route('pengaduan.create')
+            //     ->with('ok', __('pengaduan.thanks_ticket', ['ticket' => '<span class="text-red-600 font-bold">'.e($noTiket).'</span>']));
                 // ->with('success', 'Pengaduan Berhasil Dikirim.');
         } catch (\Throwable $e) {
             DB::rollBack();
         
             return back()->withInput()->withErrors(['internal' => 'Terjadi kesalahan. Silakan ulangi.']);
+            //         return back()->withInput()->withErrors([
+            //     'internal' => $e->getMessage()   // 👈 tampilkan error asli di UI
+            // ]);
         }
     }
-
     
     public function track(Request $request)
     {

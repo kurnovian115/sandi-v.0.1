@@ -16,29 +16,23 @@ class Pengaduan extends Model
         'unit_id',
         'kategori_id',
         'jenis_layanan_id',
-
         'pelapor_nama',
         'pelapor_contact',
-
         'asal_pengaduan',
-
         'judul',
         'deskripsi',
-
         'bukti_masyarakat',
-
         'prioritas',
         'status',
         'sla_due_at',
         'sla_late',
         'tanggal_selesai',
-
         'admin_upt_id',
         'admin_layanan_id',
         'petugas_nama',
-
         'hasil_tindaklanjut',
         'dokumen_penyelesaian',
+        'email',
     ];
 
     protected $casts = [
