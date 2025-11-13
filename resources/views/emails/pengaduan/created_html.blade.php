@@ -115,9 +115,9 @@
 
         {{-- Body --}}
         <div class="body">
-            <h2 style="margin:0 0 10px 0;">Pengaduan Anda Telah Diterima</h2>
+            <h2 style="margin:0 0 10px 0;">{{ __('email.subject_received') }}</h2>
 
-            <p class="muted">Yth. {{ $pengaduan->pelapor_nama ?? 'Bapak/Ibu' }},</p>
+            <p class="muted">{{ __('email.dear') }} {{ $pengaduan->pelapor_nama ?? 'Bapak/Ibu' }},</p>
 
             <p>
                 Terima kasih telah menggunakan layanan <strong>{{ config('app.name') }}</strong>.
