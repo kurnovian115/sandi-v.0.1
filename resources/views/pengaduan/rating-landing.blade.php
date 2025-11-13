@@ -158,7 +158,7 @@
                         </select>
                         <p id="err-upt" class="mt-1 text-xs text-rose-600 hidden">Silakan pilih UPT</p>
                     </div>
-                    <h2 class="text-sm mt-5 font-semibold text-slate-700 mb-3">Pilih Layanan <span
+                    <h2 class="text-sm mt-6 font-semibold text-slate-700 mb-3">Pilih Layanan <span
                             class="text-rose-500">*</span></h2>
                     <div>
                         <select required name="jenis_layanan_id" id="jenis_layanan_id"
