@@ -195,11 +195,10 @@
                     </div>
                 </div> --}}
 
-                <!-- info -->
+                <!-- Kontak -->
                 <div class="card-section">
                     <h2 class="text-sm font-semibold text-slate-700 mb-3">Informasi Pelapor <span
-                            class="text-rose-500">*</span>
-                    </h2>
+                            class="text-rose-500">*</span></h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs text-slate-600 mb-1">Nama Lengkap <span
@@ -495,7 +494,42 @@
     </script>
 
     {{-- SweetAlert2 success popup (components.alert provides Swal lib/setup) --}}
+    @if (session('ok'))
+        <script>
+            // Wait for Swal to be available (components.alert should include it)
+            // (function showOk() {
+            //     if (typeof Swal === 'undefined') {
+            //         // try again shortly
+            //         return setTimeout(showOk, 500);
+            //     }
+            //     Swal.fire({
+            //         icon: 'success',
+            //         title: 'Terima kasih!',
+            //         text: {!! json_encode(session('ok')) !!},
+            //         confirmButtonColor: '#059669'
+            //     });
+            // })();
 
+            (function waitForSwal() {
+                if (typeof Swal === 'undefined') {
+                    return setTimeout(waitForSwal, 500);
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Terima kasih!',
+                    text: {!! json_encode(session('ok')) !!},
+                    confirmButtonColor: '#059669',
+                    timer: 2000,
+                    timerProgressBar: true,
+                }).then(() => {
+                    // Auto redirect setelah swal selesai
+                    window.location.href = "{{ session('auto_redirect') }}";
+                });
+
+            })();
+        </script>
+    @endif
 
 
 </body>
