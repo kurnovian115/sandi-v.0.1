@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
             ],
             ['nip' => '197109241994031001',
-                'name' => 'Admin Kanwil',
+                'name' => 'Tedi Hartadi Wibowo',
                 'email' => 'admin.kanwil@example.com',
                 'password' => Hash::make('wibowo'),
                 'role_id' => $roleId,
