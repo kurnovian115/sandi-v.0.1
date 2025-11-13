@@ -20,16 +20,6 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3">
-                    <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar"
-                        aria-controls="logo-sidebar" type="button"
-                        class="inline-flex items-center p-2 text-slate-200 rounded-lg sm:hidden hover:bg-blue-900/30 focus:outline-none focus:ring-2 focus:ring-blue-400/40">
-                        <span class="sr-only">Buka sidebar</span>
-                        <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                            <path clip-rule="evenodd" fill-rule="evenodd"
-                                d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z" />
-                        </svg>
-                    </button>
-
                     <a href="/" class="flex items-center gap-3">
                         <img src="/images/logo.png" alt="Logo SANDI JABAR" class="w-8 h-8 object-contain" />
                         <span class="text-white text-lg font-semibold">SANDI JABAR</span>
@@ -56,13 +46,11 @@
             class="inline-flex items-center gap-3 px-4 py-2.5 rounded-full shadow-xl
                bg-gradient-to-r from-indigo-600 to-sky-500 text-white
                hover:brightness-110 hover:scale-105 transition-transform">
-
             <!-- Ikon selalu muncul -->
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 16 16"
                 aria-hidden="true">
                 <path d="M8 .5l6 5V15a1 1 0 0 1-1 1h-3v-4H6v4H3a1 1 0 0 1-1-1V5.5l6-5z" />
             </svg>
-
             <!-- Teks hanya tampil di sm ke atas -->
             <span class="hidden sm:inline font-medium">
                 Kembali ke Beranda
