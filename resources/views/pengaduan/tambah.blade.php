@@ -55,7 +55,8 @@
                 class="inline-flex items-center gap-3 px-4 py-2.5 rounded-full shadow-xl 
             bg-gradient-to-r from-indigo-600 to-sky-500 text-white
             hover:brightness-110 hover:scale-105 transition-transform">
-                <!-- ikon + teks -->
+                Kemabli ke Halaman Beranda
+                <!-- ikoKembali kn + teks -->
             </a>
         </div>
 
