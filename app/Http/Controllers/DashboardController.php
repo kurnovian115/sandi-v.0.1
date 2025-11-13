@@ -44,9 +44,9 @@ class DashboardController extends Controller
         // -----------------------
         $stat = [
             'total'   => (clone $base)->count(),
-            'proses'  => (clone $base)->whereIn('status', ['menunggu','proses'])->count(),
-            'selesai' => (clone $base)->where('status', 'selesai')->count(),
-            'ditolak' => (clone $base)->where('status', 'ditolak')->count(),
+            'proses'  => (clone $base)->whereIn('status', ['Menunggu'])->count(),            
+            'disposisi' => (clone $base)->where('status','Disposisi ke layanan')->count(),
+            'selesai' => (clone $base)->where('status', 'Selesai')->count(),
         ];
 
         // -----------------------

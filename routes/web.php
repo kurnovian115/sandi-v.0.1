@@ -62,10 +62,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{pengaduan}', [PengaduanLayananController::class, 'show'])->name('show');  
     });
 
-      Route::prefix('kanwil/beranda')->middleware('can:kanwil-only')->group(function () {
-        // Route::get('/', fn() => view('kanwil.beranda.index', ['title' => 'Beranda Kanwil']))->name('kanwil.beranda');
-         Route::get('/', [DashboardController::class, 'index'])->name('index');
-    });
+    //   Route::prefix('kanwil/beranda')->middleware('can:kanwil-only')->group(function () {
+    //     // Route::get('/', fn() => view('kanwil.beranda.index', ['title' => 'Beranda Kanwil']))->name('kanwil.beranda');
+    //      Route::get('/', [DashboardController::class, 'index'])->name('index');
+    // });
 
     Route::prefix('kanwil/beranda')->middleware('can:kanwil-only')->group(function () {
         // Route::get('/', fn() => view('kanwil.beranda.index', ['title' => 'Beranda Kanwil']))->name('kanwil.beranda');

@@ -89,24 +89,51 @@
         </form>
 
         {{-- KPI Cards (responsif) --}}
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            <div class="bg-white rounded-2xl shadow-sm p-4">
-                <p class="text-xs text-gray-500">Total Pengaduan</p>
-                <p class="mt-1 text-xl md:text-2xl font-semibold">{{ number_format($stat['total'] ?? 0) }}</p>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
+
+            {{-- Total --}}
+            <div class="rounded-2xl p-4 shadow-sm bg-indigo-50 border border-indigo-100">
+                <p class="text-xs text-indigo-700">Total Pengaduan</p>
+                <p class="mt-1 text-xl md:text-2xl font-semibold text-indigo-900">
+                    {{ number_format($stat['total'] ?? 0) }}
+                </p>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-4">
-                <p class="text-xs text-gray-500">Proses</p>
-                <p class="mt-1 text-xl md:text-2xl font-semibold">{{ number_format($stat['proses'] ?? 0) }}</p>
+
+            {{-- Proses --}}
+            <div class="rounded-2xl p-4 shadow-sm bg-amber-50 border border-amber-100">
+                <p class="text-xs text-amber-700">Dalam Proses</p>
+                <p class="mt-1 text-xl md:text-2xl font-semibold text-amber-900">
+                    {{ number_format($stat['proses'] ?? 0) }}
+                </p>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-4">
-                <p class="text-xs text-gray-500">Selesai</p>
-                <p class="mt-1 text-xl md:text-2xl font-semibold">{{ number_format($stat['selesai'] ?? 0) }}</p>
+
+            {{-- Disposisi ke Layanan (CARD BARU) --}}
+            <div class="rounded-2xl p-4 shadow-sm bg-sky-50 border border-sky-100">
+                <p class="text-xs text-sky-700">Disposisi ke Layanan</p>
+                <p class="mt-1 text-xl md:text-2xl font-semibold text-sky-900">
+                    {{ number_format($stat['disposisi'] ?? 0) }}
+                </p>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-4">
-                <p class="text-xs text-gray-500">Ditolak</p>
-                <p class="mt-1 text-xl md:text-2xl font-semibold">{{ number_format($stat['ditolak'] ?? 0) }}</p>
+
+            {{-- Selesai --}}
+            <div class="rounded-2xl p-4 shadow-sm bg-emerald-50 border border-emerald-100">
+                <p class="text-xs text-emerald-700">Selesai</p>
+                <p class="mt-1 text-xl md:text-2xl font-semibold text-emerald-900">
+                    {{ number_format($stat['selesai'] ?? 0) }}
+                </p>
             </div>
+
+            {{-- SLA Terlambat --}}
+            <div class="rounded-2xl p-4 shadow-sm bg-red-50 border border-red-200">
+                <p class="text-xs text-red-700">SLA Terlambat</p>
+                <p class="mt-1 text-xl md:text-2xl font-semibold text-red-800">
+                    {{ number_format($stat['sla_terlambat'] ?? 0) }}
+                </p>
+            </div>
+
         </div>
+
+
 
         <!-- Charts Row 1 -->
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
@@ -175,13 +202,24 @@
                                 <td class="py-2 pr-3 max-w-[28ch] truncate">{{ $row->judul ?? '-' }}</td>
                                 <td class="py-2 pr-3">{{ $row->unit_nama ?? ($row->unit->nama ?? '-') }}</td>
                                 <td class="py-2 pr-3">
-                                    @php($s = strtolower($row->status ?? 'proses'))
-                                    <span
-                                        class="px-2 py-1 rounded-full text-xs
-                                        {{ $s === 'selesai' ? 'bg-green-100 text-green-700' : ($s === 'ditolak' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700') }}">
-                                        {{ ucfirst($row->status ?? 'proses') }}
+                                    @php
+                                        $st = strtolower($row->status ?? '');
+                                    @endphp
+
+                                    @php
+                                        $colorClass = str_contains($st, 'selesai')
+                                            ? 'bg-green-100 text-green-700'
+                                            : (str_contains($st, 'disposisi')
+                                                ? 'bg-sky-100 text-sky-700'
+                                                : 'bg-yellow-100 text-yellow-700');
+                                    @endphp
+
+                                    <span class="px-2 py-1 rounded-full text-xs {{ $colorClass }}">
+                                        {{ ucfirst($row->status ?? 'Proses') }}
                                     </span>
                                 </td>
+
+
                                 <td class="py-2">{{ optional($row->created_at)->format('d M Y') }}</td>
                             </tr>
                         @empty

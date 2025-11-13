@@ -164,7 +164,7 @@
                                                             <button type="button" @click="openJawab=false"
                                                                 class="px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-50">Batal</button>
                                                             <button
-                                                                class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white">Kirim
+                                                                class="cursor-pointer px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white">Kirim
                                                                 Jawaban</button>
                                                         </div>
                                                     </form>
