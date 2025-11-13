@@ -19,11 +19,14 @@
 
     <!-- Background logo transparan + overlay gradasi putih lembut -->
     <div class="absolute inset-0 bg-linear-to-b from-white/90 via-white/95 to-white pointer-events-none">
-        <a href="/"
-            class="fixed left-4 bottom-6 z-50 inline-flex items-center gap-3 px-4 py-2.5 rounded-full 
-          shadow-xl bg-linear-to-r from-indigo-600 to-sky-500 text-white 
-          hover:brightness-110 hover:scale-105 transition-transform"
-            aria-label="Kembali ke Halaman Utama">
+
+    </div>
+    <div
+        class="fixed left-4 bottom-6 z-50 inline-flex items-center gap-3 px-4 py-2.5
+            rounded-full shadow-xl bg-gradient-to-r from-indigo-600 to-sky-500 text-white
+            hover:brightness-110 hover:scale-105 transition-transform">
+
+        <a href="/" class="flex items-center gap-3" aria-label="Kembali ke Halaman Utama">
 
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 16 16"
                 aria-hidden="true">
@@ -31,7 +34,9 @@
             </svg>
 
             <span class="hidden sm:inline font-medium">Kembali ke Beranda</span>
+
         </a>
+
     </div>
 
     <!-- Header sederhana dengan tombol Lacak Tiket -->
@@ -344,9 +349,8 @@
                 </button>
             </div>
 
-
-
             </form>
+
         </div>
         </div>
     </main>
