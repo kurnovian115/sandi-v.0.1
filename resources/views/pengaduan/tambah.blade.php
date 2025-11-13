@@ -178,7 +178,7 @@
                                 class="mt-1 w-full border rounded-lg px-3  py-2 text-sm focus:ring-2 focus:ring-indigo-300">
                                 <option value="">{{ __('pengaduan.select_upt') }}</option>
                                 @foreach ($upt as $l)
-                                    <option value="{{ $l->id }}" @selected(old('upt_id') == $l->id)>
+                                    <option value="{{ $l->id }}" @selected(old('upt_id', request('upt_id')) == $l->id)>
                                         {{ $l->name }}</option>
                                 @endforeach
                             </select>
@@ -192,7 +192,8 @@
                             <label class="block text-sm font-medium text-slate-700">{{ __('pengaduan.reporter_name') }}
                                 <span class="text-rose-500">*</span></label>
                             </label>
-                            <input type="text" name="pelapor_nama" value="{{ old('pelapor_nama') }}"
+                            <input type="text" name="pelapor_nama"
+                                value="{{ old('pelapor_nama', request('pelapor_nama')) }}"
                                 class="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-300"
                                 placeholder="{{ __('pengaduan.full_name') }}">
                             @error('pelapor_nama')
@@ -208,9 +209,9 @@
                             <label class="block text-sm font-medium text-slate-700">{{ __('pengaduan.contact') }}
                                 <span class="text-rose-500">*</span></label>
                             </label>
-                            <input type="text" name="pelapor_contact" value="{{ old('pelapor_contact') }}"
-                                inputmode="numeric" pattern="[0-9]*" maxlength="13"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                            <input type="text" name="pelapor_contact"
+                                value="{{ old('pelapor_contact', request('pelapor_contact')) }}" inputmode="numeric"
+                                pattern="[0-9]*" maxlength="13" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                 class="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-300"
                                 placeholder="{{ __('pengaduan.contact_name') }}">
 
@@ -227,7 +228,7 @@
                             <label class="block text-sm font-medium text-slate-700">{{ __('pengaduan.email') }}
                                 <span class="text-rose-500">*</span></label>
                             </label>
-                            <input type="text" name="email" value="{{ old('email') }}"
+                            <input type="text" name="email" value="{{ old('email', request('email')) }}"
                                 class="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-300"
                                 placeholder="{{ __('pengaduan.email_name') }}">
                             @error('email')
@@ -293,20 +294,28 @@
 
 
                         <div>
-                            <label class="block text-sm font-medium text-slate-700">{{ __('pengaduan.service') }}
-                                <span class="text-rose-500">*</span></label>
+                            <label class="block text-sm font-medium text-slate-700">
+                                {{ __('pengaduan.service') }}
+                                <span class="text-rose-500">*</span>
+                            </label>
+
                             <select name="jenis_layanan_id"
                                 class="mt-1 w-full border rounded-lg px-3 pr-9 py-2 text-sm focus:ring-2 focus:ring-indigo-300">
+
                                 <option value="">{{ __('pengaduan.select') }}</option>
+
                                 @foreach ($layanans as $l)
-                                    <option value="{{ $l->id }}" @selected(old('jenis_layanan_id') == $l->id)>
-                                        {{ $l->$namaField }}</option>
+                                    <option value="{{ $l->id }}" @selected(old('jenis_layanan_id', request('jenis_layanan_id')) == $l->id)>
+                                        {{ $l->$namaField }}
+                                    </option>
                                 @endforeach
                             </select>
+
                             @error('jenis_layanan_id')
                                 <div class="text-rose-600 text-xs mt-1">{{ $message }}</div>
                             @enderror
                         </div>
+
                     </div>
 
 

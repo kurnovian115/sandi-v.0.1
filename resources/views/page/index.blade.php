@@ -26,7 +26,8 @@
 
             <!-- Desktop CTAs + Auth controls -->
             <div class="hidden items-center gap-3 md:flex">
-                <a href="{{ route('pengaduan.create') }}"
+                {{-- {{ route('pengaduan.create') }} --}}
+                <a href="{{ route('pengaduan.rating') }}"
                     class="inline-flex items-center justify-center rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm transition hover:bg-blue-50 focus:outline-none focus-visible:ring focus-visible:ring-white/50">
                     Buat Pengaduan
                 </a>
@@ -108,7 +109,7 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden border-t border-white/20 bg-blue-700 px-4 py-3 md:hidden">
             <div class="flex flex-col gap-2">
-                <a href="{{ route('pengaduan.create') }}"
+                <a href="{{ route('pengaduan.rating') }}"
                     class="w-full rounded-2xl bg-white px-4 py-3 text-center text-sm font-semibold text-blue-700 hover:bg-blue-50">Buat
                     Pengaduan</a>
 
@@ -168,7 +169,7 @@
                 </p>
 
                 <div class="flex flex-wrap justify-center md:justify-start gap-3">
-                    <a href="{{ route('pengaduan.create') }}"
+                    <a href="{{ route('pengaduan.rating') }}"
                         class="inline-flex items-center gap-2 rounded-2xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:translate-y-0.5 hover:bg-blue-800 focus:outline-none focus-visible:ring focus-visible:ring-blue-300 dark:focus-visible:ring-blue-800">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                             class="h-5 w-5">

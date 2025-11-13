@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UptController;
 use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminUptController;
 use App\Http\Controllers\DashboardController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\UptPengaduanController;
 use App\Http\Controllers\PengaduanEkstController;
 use App\Http\Controllers\UPT\DisposisiController;
 use App\Http\Controllers\PengaduanMasukController;
+use App\Http\Controllers\PositiveReviewController;
 use App\Http\Controllers\KanwilPengaduanController;
 use App\Http\Controllers\PengaduanPublicController;
 use App\Http\Controllers\LayananDashboardController;
@@ -25,6 +27,16 @@ use App\Http\Controllers\PengaduanEksternalController;
 
 require __DIR__.'/beranda.php';
 
+// Route::get('/pengaduan/rating', function() {
+//     return view('pengaduan.rating-landing'); 
+// })->name('pengaduan.rating');
+
+// halaman rating (landing)
+
+
+Route::post('/positive-review', [PositiveReviewController::class, 'store'])
+    ->name('positive_review.store');
+    
 Route::prefix('pengaduan')
     ->name('pengaduan.')
     // ->middleware(['auth','can:upt-or-kanwil'])
@@ -32,7 +44,10 @@ Route::prefix('pengaduan')
         Route::get('/tambah', [PengaduanController::class, 'create'])->name('create');
         Route::post('/tambah', [PengaduanController::class, 'store'])->name('store');
         Route::get('/track', [PengaduanController::class, 'track'])->name('track');
+        Route::get('/rating', [RatingController::class, 'create'])->name('rating');
   });
+
+//   Route::get('/pengaduan/rating', [RatingController::class, 'create'])->name('pengaduan.rating');
 
 Route::get('/', function () {
     return view('page.index');
