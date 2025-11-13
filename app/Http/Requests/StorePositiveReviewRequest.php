@@ -35,23 +35,23 @@ class StorePositiveReviewRequest extends FormRequest
         ];
     }
 
-    public function withValidator($validator)
-    {
-        $validator->after(function ($v) {
-            $key = $this->throttleKey();
-            if (RateLimiter::tooManyAttempts($key, 10)) {
-                $v->errors()->add('rating', 'Terlalu banyak permintaan dari alamat ini. Silakan coba lagi nanti.');
-            }
-        });
-    }
+    // public function withValidator($validator)
+    // {
+    //     $validator->after(function ($v) {
+    //         $key = $this->throttleKey();
+    //         if (RateLimiter::tooManyAttempts($key, 10)) {
+    //             $v->errors()->add('rating', 'Terlalu banyak permintaan dari alamat ini. Silakan coba lagi nanti.');
+    //         }
+    //     });
+    // }
 
-    public function passedValidation()
-    {
-        RateLimiter::hit($this->throttleKey(), 3600);
-    }
+    // public function passedValidation()
+    // {
+    //     RateLimiter::hit($this->throttleKey(), 3600);
+    // }
 
-    protected function throttleKey()
-    {
-        return 'positive-review:' . $this->ip();
-    }
+    // protected function throttleKey()
+    // {
+    //     return 'positive-review:' . $this->ip();
+    // }
 }

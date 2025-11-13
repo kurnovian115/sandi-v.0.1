@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Sandi Jabar — Nilai & Ulasan</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
     <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
 
     <style>
@@ -158,7 +157,7 @@
                         </select>
                         <p id="err-upt" class="mt-1 text-xs text-rose-600 hidden">Silakan pilih UPT</p>
                     </div>
-                    <h2 class="text-sm mt-6 font-semibold text-slate-700 mb-3">Pilih Layanan <span
+                    <h2 class="text-sm mt-5 font-semibold text-slate-700 mb-3">Pilih Layanan <span
                             class="text-rose-500">*</span></h2>
                     <div>
                         <select required name="jenis_layanan_id" id="jenis_layanan_id"
@@ -308,7 +307,7 @@
     </div>
 
     {{-- include swal component (you said it's available) --}}
-    @include('components.alert')
+    {{-- @include('components.alert') --}}
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -495,6 +494,42 @@
     </script>
 
     {{-- SweetAlert2 success popup (components.alert provides Swal lib/setup) --}}
+    @if (session('ok'))
+        <script>
+            // Wait for Swal to be available (components.alert should include it)
+            // (function showOk() {
+            //     if (typeof Swal === 'undefined') {
+            //         // try again shortly
+            //         return setTimeout(showOk, 500);
+            //     }
+            //     Swal.fire({
+            //         icon: 'success',
+            //         title: 'Terima kasih!',
+            //         text: {!! json_encode(session('ok')) !!},
+            //         confirmButtonColor: '#059669'
+            //     });
+            // })();
+
+            (function waitForSwal() {
+                if (typeof Swal === 'undefined') {
+                    return setTimeout(waitForSwal, 500);
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Terima kasih!',
+                    text: {!! json_encode(session('ok')) !!},
+                    confirmButtonColor: '#059669',
+                    timer: 2000,
+                    timerProgressBar: true,
+                }).then(() => {
+                    // Auto redirect setelah swal selesai
+                    window.location.href = "{{ session('auto_redirect') }}";
+                });
+
+            })();
+        </script>
+    @endif
 
 
 </body>
