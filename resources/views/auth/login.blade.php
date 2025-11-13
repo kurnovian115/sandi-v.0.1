@@ -1,8 +1,6 @@
 <x-guest-layout>
     <a href="/"
-        class="fixed left-4 bottom-6 z-50 inline-flex items-center gap-3 px-4 py-2.5 rounded-full 
-          shadow-xl bg-linear-to-r from-indigo-600 to-sky-500 text-white 
-          hover:brightness-110 hover:scale-105 transition-transform"
+        class="fixed left-4 top-6 z-50 inline-flex items-center gap-3 px-4 py-2.5 rounded-full shadow-xl bg-linear-to-r from-indigo-600 to-sky-500 text-white hover:brightness-110 hover:scale-105 transition-transform"
         aria-label="Kembali ke Halaman Utama">
 
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
