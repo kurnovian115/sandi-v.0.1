@@ -494,42 +494,7 @@
     </script>
 
     {{-- SweetAlert2 success popup (components.alert provides Swal lib/setup) --}}
-    @if (session('ok'))
-        <script>
-            // Wait for Swal to be available (components.alert should include it)
-            // (function showOk() {
-            //     if (typeof Swal === 'undefined') {
-            //         // try again shortly
-            //         return setTimeout(showOk, 500);
-            //     }
-            //     Swal.fire({
-            //         icon: 'success',
-            //         title: 'Terima kasih!',
-            //         text: {!! json_encode(session('ok')) !!},
-            //         confirmButtonColor: '#059669'
-            //     });
-            // })();
 
-            (function waitForSwal() {
-                if (typeof Swal === 'undefined') {
-                    return setTimeout(waitForSwal, 500);
-                }
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Terima kasih!',
-                    text: {!! json_encode(session('ok')) !!},
-                    confirmButtonColor: '#059669',
-                    timer: 2000,
-                    timerProgressBar: true,
-                }).then(() => {
-                    // Auto redirect setelah swal selesai
-                    window.location.href = "{{ session('auto_redirect') }}";
-                });
-
-            })();
-        </script>
-    @endif
 
 
 </body>
