@@ -307,7 +307,7 @@
     </div>
 
     {{-- include swal component (you said it's available) --}}
-    {{-- @include('components.alert') --}}
+    @include('components.alert')
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
