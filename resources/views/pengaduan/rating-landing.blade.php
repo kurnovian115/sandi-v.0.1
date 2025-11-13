@@ -197,8 +197,9 @@
 
                 <!-- Kontak -->
                 <div class="card-section">
-                    <h2 class="text-sm font-semibold text-slate-700 mb-3">Informasi Kontak <span
-                            class="text-rose-500">*</span></h2>
+                    <h2 class="text-sm font-semibold text-slate-700 mb-3">Informasi Pelapor <span
+                            class="text-rose-500">*</span>
+                    </h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs text-slate-600 mb-1">Nama Lengkap <span
