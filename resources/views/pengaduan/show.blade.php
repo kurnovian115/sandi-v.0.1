@@ -210,7 +210,7 @@
                                     <th class="text-left py-3 px-3">Waktu</th>
                                     <th class="text-left py-3 px-3">User</th>
                                     <th class="text-left py-3 px-3">Aksi</th>
-                                    <th class="text-left py-3 px-3">Status Setelah</th>
+                                    <th class="text-left py-3 px-3">Status</th>
                                     <th class="text-left py-3 px-3">Catatan</th>
                                 </tr>
                             </thead>
@@ -223,8 +223,13 @@
                                         <td class="py-3 px-3">
                                             {{ $log->aksi ?? ($log->action ?? ($log->tipe ?? ($log->type ?? '—'))) }}
                                         </td>
-                                        <td class="py-3 px-3">{{ $log->status_setelah ?? ($log->status ?? '—') }}</td>
-                                        <td class="py-3 px-3">{{ $log->catatan ?? ($log->keterangan ?? '—') }}</td>
+                                        <td class="py-3 px-3">{{ $log->status_setelah ?? ($log->status_after ?? '—') }}
+                                        </td>
+                                        <td class="py-3 px-3 whitespace-normal wrap-break-words max-w-md">
+                                            {{ $log->catatan ?? ($log->note ?? '—') }}
+                                        </td>
+
+
                                     </tr>
                                 @empty
                                     <tr>

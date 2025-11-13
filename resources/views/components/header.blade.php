@@ -12,11 +12,24 @@
                     </svg>
                 </button>
 
-                <a href="#" class="flex items-center gap-2 md:gap-3 ms-2 md:me-24 transition-all duration-300">
+                <a href="/" class="flex items-center gap-2 md:gap-3 ms-2 md:me-24 transition-all duration-300">
                     <img src="/images/logo.png" alt="Logo SANDI JABAR" class="w-8 h-8 sm:w-9 sm:h-9 object-contain" />
-                    <span class="text-lg sm:text-xl md:text-2xl font-semibold text-white whitespace-nowrap">SANDI
-                        JABAR</span>
+
+                    <div class="flex flex-col leading-tight">
+                        {{-- Judul aplikasi (lebih kecil supaya navbar tidak tinggi) --}}
+                        <span class="text-base sm:text-lg md:text-xl font-semibold text-white whitespace-nowrap">
+                            SANDI JABAR
+                        </span>
+
+                        {{-- Nama UPT (lebih kecil juga) --}}
+                        @if (optional(Auth::user()->unit)->name)
+                            <span class="hidden md:inline-block text-xs text-blue-100/90 mt-0.5 leading-snug">
+                                {{ Str::limit(optional(Auth::user()->unit)->name, 42) }}
+                            </span>
+                        @endif
+                    </div>
                 </a>
+
             </div>
 
             <div class="flex items-center space-x-2">

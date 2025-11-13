@@ -138,7 +138,16 @@
                                     </td>
                                     <td class="py-3 pr-3 text-xs">
                                         <span
-                                            class="inline-flex items-center gap-1 px-2 py-1 rounded-full border text-xs {{ $p->status_badge_class }}">{{ $p->status_label }}</span>
+                                            class="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-full border bg-amber-50 text-amber-700 border-amber-200">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-current/60"></span>
+                                            {{-- @dd($row->status_label) --}}
+                                            @if ($p->status_label === 'Diproses oleh user layanan ')
+                                                Menunggu
+                                            @else
+                                                {{ $row->status_label }}
+                                            @endif
+
+                                        </span>
                                     </td>
                                     {{-- <td class="py-3 pr-3 text-xs">
                                         @if ($p->sla_due_at)

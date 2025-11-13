@@ -10,7 +10,7 @@
                         <h1 class="text-lg sm:text-xl font-semibold">Dashboard UPT</h1>
                         <p class="text-xs sm:text-sm text-indigo-100/90">Ringkasan pengaduan pada unit Anda.</p>
                     </div>
-                    <a href="{{ route('pengaduan.index') }}"
+                    <a href="{{ route('pengaduan.upt') }}"
                         class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm bg-white/20 hover:bg-white/30">
                         <i class="bi bi-table"></i>
                         Lihat Semua Pengaduan

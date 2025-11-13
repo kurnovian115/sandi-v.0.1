@@ -1,16 +1,17 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Role;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Support\Str;
 use App\Models\JenisLayanan;
 use Illuminate\Http\Request;
+
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+
 
 class AdminLayananController extends Controller
 {
@@ -21,57 +22,129 @@ class AdminLayananController extends Controller
     {
         $this->adminRoleId = (int) Role::where('name', 'admin_layanan')->value('id');
     }
-public function index(Request $request)
-{
-    $units = Unit::orderBy('name')->get();
+// public function index(Request $request)
+// {
+//     $units = Unit::orderBy('name')->get();
 
-    $query = User::with('unit')
-        ->whereHas('role', fn($r) => $r->where('name','admin_layanan'));
+//     $query = User::with('unit')
+//         ->whereHas('role', fn($r) => $r->where('name','admin_layanan'));
 
-    if ($request->filled('q')) {
-        $query->where(function ($q) use ($request) {
-            $q->where('name','like','%'.$request->q.'%')
-            ->orWhere('email','like','%'.$request->q.'%')
-            ->orWhere('nip','like','%'.$request->q.'%');
-        });
+//     if ($request->filled('q')) {
+//         $query->where(function ($q) use ($request) {
+//             $q->where('name','like','%'.$request->q.'%')
+//             ->orWhere('email','like','%'.$request->q.'%')
+//             ->orWhere('nip','like','%'.$request->q.'%');
+//         });
+//     }
+//     if ($request->filled('unit_id')) $query->where('unit_id', $request->unit_id);
+//     if ($request->filled('status'))  $query->where('is_active', $request->status === 'active');
+
+//     $users = $query->latest()->paginate(7);
+
+//     return view('admin-layanan.index', [
+//         'title' => 'Manajemen Pengguna — Admin Layanan',
+//         'users' => $users,
+//         'units' => $units,
+//     ]);
+// }
+
+    public function index(Request $request)
+    {
+        $auth = Auth::user();
+
+        // Default: ambil semua unit
+        $isUpt = false;
+        $userUnitId = null;
+
+        if ($auth) {
+            // jika role relationship ada, cek nama role. 
+            // sesuaikan 'admin_upt' dengan nama role yang kalian pakai
+            $roleName = optional($auth->role)->name;
+
+            if ($roleName === 'admin_upt') {
+                $isUpt = true;
+                $userUnitId = (int) $auth->unit_id;
+                // units hanya berisi unit milik user (array koleksi 1)
+                $units = Unit::where('id', $userUnitId)->orderBy('name')->get();
+            } else {
+                // non-upt (kanwil / superadmin) => semua unit
+                $units = Unit::orderBy('name')->get();
+            }
+        } else {
+            // fallback: kalau belum login (seharusnya tidak terjadi), tetap semua unit
+            $units = Unit::orderBy('name')->get();
+        }
+
+        // Query user: hanya admin_layanan (sebelumnya)
+        $query = User::with('unit')
+            ->whereHas('role', fn($r) => $r->where('name','admin_layanan'));
+
+        // Jika yang login adalah admin UPT, batasi data users ke unit miliknya
+        if ($isUpt && $userUnitId) {
+            $query->where('unit_id', $userUnitId);
+        } else {
+            // hanya terapkan filter unit_id dari request jika bukan admin UPT
+            if ($request->filled('unit_id')) {
+                $query->where('unit_id', $request->unit_id);
+            }
+        }
+
+        // Pencarian teks tetap berlaku
+        if ($request->filled('q')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name','like','%'.$request->q.'%')
+                ->orWhere('email','like','%'.$request->q.'%')
+                ->orWhere('nip','like','%'.$request->q.'%');
+            });
+        }
+
+        // Status filter (active/inactive)
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'inactive') {
+                $query->where('is_active', false);
+            }
+        }
+
+        $users = $query->latest()->paginate(7)->withQueryString();
+
+        return view('admin-layanan.index', [
+            'title' => 'Manajemen Pengguna — Admin Layanan',
+            'users' => $users,
+            'units' => $units,
+            'isUpt' => $isUpt,
+            'userUnitId' => $userUnitId,
+        ]);
     }
-    if ($request->filled('unit_id')) $query->where('unit_id', $request->unit_id);
-    if ($request->filled('status'))  $query->where('is_active', $request->status === 'active');
 
-    $users = $query->latest()->paginate(7);
+    public function create()
+    {
+        $user = Auth::user();
 
-    return view('admin-layanan.index', [
-        'title' => 'Manajemen Pengguna — Admin Layanan',
-        'users' => $users,
-        'units' => $units,
-    ]);
-}
+       $roleName = optional($user->role)->name; // sesuaikan dengan relasi dan nama role Anda
 
-public function create()
-{
-    // $units = Unit::orderBy('name')->get(['id','name']);
-    // $layanans = JenisLayanan::orderBy('nama')->get(['id','nama']);
-    // return view('admin-layanan.tambah', [
-    //     'title' => 'Tambah Admin Layanan',
-    //     'units' => $units,
-    //     'layanans' => $layanans,
-    // ]);
-    $user = Auth::user();
+        if ($roleName === 'admin_upt') {
+            // User adalah admin UPT → tampilkan hanya unit miliknya
+            $unit = Unit::find($user->unit_id);
+            $units = $unit ? collect([$unit]) : collect([]);
+            $lockedUnit = $user->unit_id;
+        } else {
+            // User bukan admin UPT → tampilkan semua unit
+            $units = Unit::orderBy('name')->get(['id','name']);
+            $lockedUnit = null;
+        }
 
-    // jika user punya unit_id, tampilkan hanya UPT milik user
-    $units = $user && $user->unit_id
-        ? collect([ Unit::find($user->unit_id) ])->filter() // filter() untuk safety jika null
-        : Unit::orderBy('name')->get(['id','name']);
 
-    $layanans = JenisLayanan::orderBy('nama')->get(['id','nama']);
+        $layanans = JenisLayanan::orderBy('nama')->get(['id','nama']);
 
-    return view('admin-layanan.tambah', [
-        'title' => 'Tambah Admin Layanan',
-        'units' => $units,
-        'layanans' => $layanans,
-        'lockedUnit' => $user->unit_id ?? null,
-    ]);
-}
+        return view('admin-layanan.tambah', [
+            'title' => 'Tambah Admin Layanan',
+            'units' => $units,
+            'layanans' => $layanans,
+            'lockedUnit' => $lockedUnit,
+        ]);
+    }
 
 public function store(Request $request)
 {
@@ -84,6 +157,17 @@ public function store(Request $request)
         'is_active' => ['nullable','boolean'],
         'layanan_id' => ['required',Rule::exists('jenis_layanan','id')],
     ]);
+
+    // Cek duplikat: apakah sudah ada user lain di unit yang sama dengan layanan yg dipilih?
+    $exists = User::where('unit_id', $validated['unit_id'])
+                ->where('layanan_id', $validated['layanan_id'])
+                ->exists();
+
+    if ($exists) {
+        return back()
+            ->withInput()
+            ->withErrors(['layanan_id' => 'Di unit ini sudah ada admin untuk layanan yang dipilih.']);
+    }
 
     $roleId = Role::where('name', 'admin_layanan')->value('id');
     if (!$roleId) return back()->withErrors(['role'=>'Role admin layanan tidak ditemukan.']);

@@ -12,9 +12,8 @@ use Illuminate\Http\Request;
 use App\Models\KategoriPengaduan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StorePengaduanRequest;
+
 
 class PengaduanController extends Controller
 {
@@ -166,25 +165,22 @@ class PengaduanController extends Controller
         'adminLayanan',
         'logs.user' // jika log ada relasi user
         ])->findOrFail($id);
-
-
         $title = "Detail Pengaduan — {$pengaduan->no_tiket}";
 
-
         return view('pengaduan.show', compact('pengaduan', 'title'));
-        }
+    }
 
-        public function create(Request $request)
-        {
-            $source = $request->query('source', 'qr');
+    public function create(Request $request)
+    {
+        $source = $request->query('source', 'qr');
 
-            // tarik kategori & jenis layanan aktif untuk dropdown
-            $kategoris = KategoriPengaduan::where('is_active', 1)->orderBy('id')->get();
-            $layanans  = JenisLayanan::where('is_active', 1)->orderBy('id')->get();
-            $upt  = Unit::where('is_active', 1)->orderBy('id')->get();
+        // tarik kategori & jenis layanan aktif untuk dropdown
+        $kategoris = KategoriPengaduan::where('is_active', 1)->orderBy('id')->get();
+        $layanans  = JenisLayanan::where('is_active', 1)->orderBy('id')->get();
+        $upt  = Unit::where('is_active', 1)->orderBy('id')->get();
 
-            return view('pengaduan.tambah', compact('kategoris', 'layanans', 'source', 'upt'));
-        }
+        return view('pengaduan.tambah', compact('kategoris', 'layanans', 'source', 'upt'));
+    }
 
     public function store(StorePengaduanRequest $request)
     {

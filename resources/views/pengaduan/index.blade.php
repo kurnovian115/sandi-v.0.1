@@ -111,11 +111,11 @@
                     <table class="min-w-full text-sm">
                         <thead>
                             <tr class="text-left text-slate-600 border-b border-slate-200">
+                                <th class="py-3 pr-3">UPT</th>
                                 <th class="py-3 pr-3">Tiket</th>
-                                <th class="py-3 pr-3">Dibuat</th>
+                                <th class="py-3 pr-3">Tanggal</th>
                                 <th class="py-3 pr-3">Asal Pengaduan</th>
                                 <th class="py-3 pr-3">Pelapor</th>
-                                <th class="py-3 pr-3">UPT</th>
                                 {{-- <th class="py-3 pr-3">Layanan</th> --}}
                                 <th class="py-3 pr-3">Judul</th>
                                 <th class="py-3 pr-3">Status</th>
@@ -125,6 +125,8 @@
                         <tbody>
                             @forelse ($pengaduans as $p)
                                 <tr class="border-b border-slate-100">
+                                    <td class="py-3 pr-3 text-xs uppercase font-medium text-slate-800">
+                                        {{ optional($p->unit)->name ?: '—' }}</td>
                                     <td class="py-3 pr-3 text-xs font-medium text-slate-800">{{ $p->no_tiket }}</td>
                                     <td class="py-3 pr-3 text-xs text-slate-600">
                                         {{ optional($p->created_at)->format('d M Y H:i') }}</td>
@@ -142,7 +144,7 @@
                                         <div class="text-xs text-slate-500">{{ $p->pelapor_contact ?: '—' }}</div>
                                     </td>
 
-                                    <td class="py-3 pr-3 text-xs">{{ optional($p->unit)->name ?: '—' }}</td>
+
                                     {{-- <td class="py-3 pr-3 text-xs">{{ optional($p->jenisLayanan)->nama ?: '—' }}</td> --}}
                                     <td class="py-3 pr-3 text-xs max-w-[280px]">
                                         <div class="line-clamp-2">{{ $p->judul }}</div>

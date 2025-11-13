@@ -30,8 +30,7 @@
                     {{-- Search + Cari (stack on mobile, merged on lg) --}}
                     {{-- Search + Cari (responsif) --}}
                     <div class="w-full lg:w-auto lg:flex lg:items-stretch gap-0">
-                        <input type="text" name="q" value="{{ request('q') }}"
-                            placeholder="Cari nama / NIP / email"
+                        <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama / NIP "
                             class="w-full rounded-lg lg:rounded-l-lg lg:rounded-r-none border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500">
 
                         {{-- Tombol cari --}}
@@ -45,19 +44,28 @@
                     {{-- Filter UPT --}}
                     <div class="relative w-full lg:w-64">
                         <select name="unit_id"
-                            class="w-full appearance-none rounded-lg border border-slate-300 px-3 pr-9 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            class="w-full appearance-none rounded-lg border border-slate-300 px-3 pr-9 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            @if ($isUpt) disabled @endif>
                             <option value="">Semua UPT</option>
+
+                            {{-- Jika admin UPT, $units hanya berisi 1 unit --}}
                             @foreach ($units as $u)
-                                <option value="{{ $u->id }}" @selected(request('unit_id') == $u->id)>{{ $u->name }}
+                                <!-- {{-- kalau select dinonaktifkan, tetap kirim nilai via hidden input agar request punya unit_id --}} -->
+                                <option value="{{ $u->id }}" @selected(request('unit_id', $userUnitId) == $u->id)>{{ $u->name }}
                                 </option>
                             @endforeach
                         </select>
-                        <i
-                            class="bi bi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+
+                        @if ($isUpt)
+                            {{-- kirimkan nilai unit_id lewat hidden input supaya request tetap membawa unit_id saat submit --}}
+                            <input type="hidden" name="unit_id" value="{{ $userUnitId }}">
+                        @endif
                     </div>
 
+
+
                     {{-- Filter Status --}}
-                    <div class="relative w-full lg:w-48">
+                    {{-- <div class="relative w-full lg:w-48">
                         <select name="status"
                             class="w-full appearance-none rounded-lg border border-slate-300 px-3 pr-9 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500">
                             <option value="">Semua Status</option>
@@ -66,7 +74,7 @@
                         </select>
                         <i
                             class="bi bi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
-                    </div>
+                    </div> --}}
 
                     {{-- Terapkan & Reset --}}
                     <button type="submit"

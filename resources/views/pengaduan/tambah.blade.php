@@ -215,7 +215,7 @@
                             {{-- Input muncul hanya jika pilih opsi Lainnya dari table (atau opsi manual jika tidak ada) --}}
                             <div x-show="isOther" x-cloak class="mt-2">
                                 <input type="text" name="kategori_lainnya" value="{{ old('kategori_lainnya') }}"
-                                    placeholder="Tulis kategori lainnya..."
+                                    {{-- placeholder="Tulis kategori lainnya..." --}}
                                     class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500">
 
                                 @error('kategori_lainnya')

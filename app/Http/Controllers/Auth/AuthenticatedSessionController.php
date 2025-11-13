@@ -51,10 +51,16 @@ class AuthenticatedSessionController extends Controller
     }
 
     // Cek status UPT (jika wajib punya unit aktif)
-    if (! $user->unit || ! $user->unit->is_active) {
-        throw ValidationException::withMessages([
-            'nip' => __('UPT Anda nonaktif. Silakan hubungi admin.'),
-        ]);
+      // Cek kredensial (NIP/password)
+    $isKanwil = $user->role->name === 'admin_kanwil';
+    
+    if (! $isKanwil) {
+        // dd('masuk');
+        if (! $user->unit || ! $user->unit->is_active) {
+            throw ValidationException::withMessages([
+                'nip' => __('UPT Anda nonaktif. Silakan hubungi admin.'),
+            ]);
+        }
     }
 
     // Lolos semua: login
@@ -67,7 +73,7 @@ class AuthenticatedSessionController extends Controller
         'admin_kanwil' => redirect()->intended('/kanwil/beranda'),
         'admin_upt'    => redirect()->intended('/upt/beranda'),
         'admin_layanan' => redirect()->intended('/layanan/beranda'),
-        default        => redirect()->intended('/dashboard'),
+        // default        => redirect()->intended('/dashboard'),
     };
         $request->validate([
             'nip' => 'required|string',
@@ -93,7 +99,7 @@ class AuthenticatedSessionController extends Controller
         return match ($user->role->name ?? '') {
             'admin_kanwil' => redirect()->intended('/kanwil/beranda'),
             'admin_upt'    => redirect()->intended('/upt/beranda'),
-            'user_layanan' => redirect()->intended('/beranda/layanan'),
+            'user_layanan' => redirect()->intended('/layanan/beranda'),
             default        => redirect()->intended('/beranda'),
         };
 

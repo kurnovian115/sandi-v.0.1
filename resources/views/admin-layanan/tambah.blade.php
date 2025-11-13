@@ -38,32 +38,24 @@
                 </div> --}}
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700">Unit Pelaksana Teknis <span
-                            class="text-rose-500">*</span></label>
+                    <label class="block text-xs text-slate-600 mb-1">UPT</label>
 
-                    @if (!empty($lockedUnit))
-                        {{-- tampilkan nama UPT, disable agar tidak bisa diubah --}}
-                        <select disabled
-                            class="w-full mt-1 rounded-lg border px-3 py-2 text-sm bg-slate-50 border-slate-300">
-                            <option value="{{ $lockedUnit }}">{{ optional($units->first())->name ?? '—' }}</option>
-                        </select>
-                        {{-- tetap kirim nilai unit_id lewat hidden input --}}
+                    <select name="unit_id" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                        @if (!is_null($lockedUnit)) disabled @endif>
+                        <option value="">Pilih UPT</option>
+                        @foreach ($units as $u)
+                            <option value="{{ $u->id }}" @selected(old('unit_id', $lockedUnit) == $u->id)>{{ $u->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    {{-- Jika select dinonaktifkan, kirimkan nilai lewat hidden supaya server tetap dapat unit_id --}}
+                    @if (!is_null($lockedUnit))
                         <input type="hidden" name="unit_id" value="{{ $lockedUnit }}">
-                    @else
-                        <select name="unit_id" autofocus
-                            class="w-full mt-1 rounded-lg border px-3 py-2 text-sm appearance-none bg-white @error('unit_id') border-rose-400 focus:border-rose-500 focus:ring-rose-500 @else border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 @enderror">
-                            <option value="">Pilih UPT</option>
-                            @foreach ($units as $u)
-                                <option value="{{ $u->id }}" @selected(old('unit_id') == $u->id)>{{ $u->name }}
-                                </option>
-                            @endforeach
-                        </select>
                     @endif
-
-                    @error('unit_id')
-                        <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
-                    @enderror
                 </div>
+
+
 
                 {{-- Jenis Layanan --}}
                 <div>

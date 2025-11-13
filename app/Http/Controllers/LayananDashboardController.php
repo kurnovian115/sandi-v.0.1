@@ -22,7 +22,7 @@ class LayananDashboardController extends Controller
         $to   = $request->date('to')   ?: now()->endOfDay();
 
         $base = Pengaduan::query()
-            ->where('admin_layanan_id', $user->layanan_id)
+            ->where('admin_layanan_id', $user->id)
             ->whereBetween('created_at', [$from, $to]);
 
         // Ringkasan

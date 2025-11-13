@@ -3,7 +3,7 @@
     @php
         // Siapkan opsi UPT; fallback dari barLabels bila $upts kosong
         $unitOptions = collect($upts ?? [])
-            ->map(fn($u) => ['id' => $u->id, 'nama' => $u->nama])
+            ->map(fn($u) => ['id' => $u->id, 'nama' => $u->nama ?? $u->name])
             ->values()
             ->all();
         if (empty($unitOptions) && !empty($barLabels ?? [])) {
@@ -11,7 +11,7 @@
         }
 
         // Siapkan opsi Layanan; fallback dari pieLabels bila $layanan tidak ada
-        $layananOptions = collect($layanan ?? [])
+        $layananOptions = collect($layanans ?? ($layanan ?? []))
             ->map(fn($l) => ['id' => $l->id, 'nama' => $l->nama])
             ->values()
             ->all();
@@ -20,64 +20,73 @@
         }
     @endphp
 
-    <div class="p-4 md:p-6 space-y-6" x-data="dashboardState()">
+    <div class="p-4 md:p-6 space-y-6">
         <!-- Header & Filters -->
         <div class="space-y-1">
             <h1 class="text-2xl md:text-3xl font-bold tracking-tight">{{ $title ?? 'Beranda — Admin Kanwil' }}</h1>
             <p class="text-sm text-gray-500">Ringkasan pengaduan seluruh UPT di lingkungan Kanwil.</p>
         </div>
 
-        {{-- Filters (responsif) --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+        {{-- Filters (responsif) - menggunakan form GET sederhana --}}
+        <form method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
             <div class="min-w-0">
-                <input type="month" x-model="filters.start"
+                <input type="month" name="start" value="{{ request('start', now()->startOfYear()->format('Y-m')) }}"
                     class="w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" />
             </div>
+
             <div class="min-w-0">
-                <input type="month" x-model="filters.end"
+                <input type="month" name="end" value="{{ request('end', now()->format('Y-m')) }}"
                     class="w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" />
             </div>
 
             {{-- UPT --}}
             <div class="min-w-0">
-                <select x-model="filters.unit_id"
+                <select name="unit_id"
                     class="w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
                     <option value="">Semua UPT</option>
-                    @foreach ($upts ?? [] as $u)
-                        <option value="{{ $u->id }}">{{ $u->nama }}</option>
+                    @foreach ($upts ?? $unitOptions as $u)
+                        <option value="{{ $u->id }}" @selected(request('unit_id') == $u->id)>{{ $u->nama ?? $u->name }}
+                        </option>
                     @endforeach
                 </select>
             </div>
 
             {{-- Kategori --}}
             <div class="min-w-0">
-                <select x-model="filters.kategori_id"
+                <select name="kategori_id"
                     class="w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
                     <option value="">Semua Kategori</option>
                     @foreach ($kategori ?? [] as $k)
-                        <option value="{{ $k->id }}">{{ $k->nama }}</option>
+                        <option value="{{ $k->id }}" @selected(request('kategori_id') == $k->id)>{{ $k->nama }}</option>
                     @endforeach
                 </select>
             </div>
 
             {{-- Layanan (filter tambahan) --}}
             <div class="min-w-0">
-                <select x-model="filters.layanan_id"
+                <select name="layanan_id"
                     class="w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
                     <option value="">Semua Layanan</option>
-                    @foreach ($layanans ?? [] as $l)
-                        <option value="{{ $l->id }}">{{ $l->nama }}</option>
+                    @foreach ($layanans ?? ($layanan ?? $layananOptions) as $l)
+                        <option value="{{ $l->id }}" @selected(request('layanan_id') == $l->id)>{{ $l->nama }}</option>
                     @endforeach
                 </select>
             </div>
 
             <div class="sm:col-span-2 lg:col-span-1">
-                <button @click="applyFilters()"
-                    class="w-full h-full px-4 py-2 rounded-2xl bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm">
-                    Terapkan
-                </button>
+                <div class="flex gap-2">
+                    <button type="submit"
+                        class="w-full h-full px-4 py-2 rounded-2xl bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm">
+                        Terapkan
+                    </button>
+
+                    <a href="{{ url()->current() }}"
+                        class="w-full h-full px-4 py-2 rounded-2xl bg-slate-200 text-slate-800 text-center">
+                        Reset
+                    </a>
+                </div>
             </div>
-        </div>
+        </form>
 
         {{-- KPI Cards (responsif) --}}
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -144,7 +153,8 @@
         <div class="bg-white rounded-2xl shadow-sm p-4 md:p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-lg font-semibold">Pengaduan Terbaru</h2>
-                <a href="#" class="text-indigo-600 hover:text-indigo-800 text-sm">Lihat semua →</a>
+                <a href="{{ route('pengaduan.index') }}" class="text-indigo-600 hover:text-indigo-800 text-sm">Lihat
+                    semua →</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
@@ -185,35 +195,13 @@
 
         </div>
         <div class="mt-4">
-            {{ $latest->links() }}
+            {{ $latest->appends(request()->except('page'))->links() }}
         </div>
     </div>
 
-    {{-- Scripts (tanpa x-slot, taruh langsung di sini) --}}
+    {{-- Scripts (Chart.js tetap dipakai) --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        function dashboardState() {
-            return {
-                filters: {
-                    start: new Date(new Date().getFullYear(), 0).toISOString().slice(0, 7),
-                    end: new Date().toISOString().slice(0, 7),
-                    unit_id: '',
-                    kategori_id: '',
-                    layanan_id: '',
-                },
-                applyFilters() {
-                    const params = new URLSearchParams({
-                        start: this.filters.start || '',
-                        end: this.filters.end || '',
-                        unit_id: this.filters.unit_id || '',
-                        kategori_id: this.filters.kategori_id || '',
-                        layanan_id: this.filters.layanan_id || '',
-                    });
-                    window.location = `?${params.toString()}`;
-                }
-            }
-        }
-
         window.addEventListener('load', () => {
             // Data dari controller (pakai fallback aman)
             const labels = @json($trendMonthLabels ?? []);

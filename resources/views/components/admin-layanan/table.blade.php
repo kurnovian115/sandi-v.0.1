@@ -9,8 +9,8 @@
                 <th class="border border-slate-200 px-4 py-3 text-left align-middle">Nama</th>
                 <th class="border border-slate-200 px-4 py-3 text-left align-middle">NIP</th>
                 {{-- <th class="border border-slate-200 px-4 py-3 text-left align-middle">Email</th> --}}
-                <th class="border border-slate-200 px-4 py-3 text-center align-middle">Status</th>
                 <th class="border border-slate-200 px-4 py-3 text-center align-middle">Aksi</th>
+                {{-- <th class="border border-slate-200 px-4 py-3 text-center align-middle">Aksi</th> --}}
             </tr>
         </thead>
 
@@ -36,7 +36,7 @@
                     </td> --}}
 
                     {{-- STATUS (nowrap biar nggak pecah) --}}
-                    <td class="border border-slate-200 px-4 py-3 text-center align-middle whitespace-nowrap">
+                    {{-- <td class="border border-slate-200 px-4 py-3 text-center align-middle whitespace-nowrap">
                         @if ($user->is_active)
                             <span
                                 class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full border border-green-300 bg-green-50 text-green-700">
@@ -48,10 +48,10 @@
                                 <span class="h-2 w-2 rounded-full bg-rose-500"></span> Nonaktif
                             </span>
                         @endif
-                    </td>
+                    </td> --}}
 
                     {{-- AKSI (nowrap + tombol compact + flex-nowrap) --}}
-                    <td class="border border-slate-200 px-4 py-3 text-left align-middle whitespace-nowrap">
+                    <td class="border border-slate-200 px-4 py-3 text-center align-middle whitespace-nowrap">
                         <div class="inline-flex items-center gap-2 flex-nowrap">
                             {{-- Detail --}}
                             <a href="{{ route('admin-layanan.show', $user->id) }}"
@@ -78,44 +78,42 @@
 
                             {{-- Nonaktifkan --}}
                             {{-- di resources/views/kanwil/users/admin-upt.blade.php (kolom Aksi) --}}
-                            @php
+                            {{-- @php
                                 $btn =
                                     'inline-flex items-center gap-1.5 h-8 px-3 rounded-md border text-xs font-medium transition cursor-pointer';
                                 $svg = 'w-3.5 h-3.5';
                             @endphp
                             @if ($user->is_active)
-                                {{-- Nonaktifkan --}}
-                                <form id="form-nonaktif-{{ $user->id }}"
-                                    action="{{ route('admin-layanan.nonaktif', $user->id) }}" method="POST"
-                                    class="inline">
-                                    @csrf @method('PUT')
-                                    <button type="button"
-                                        onclick="confirmNonaktif({{ $user->id }}, @js($user->name))"
-                                        class="{{ $btn }} border-rose-200 text-rose-700 hover:bg-rose-50">
-                                        <svg class="{{ $svg }}" viewBox="0 0 16 16" fill="currentColor">
-                                            <path
-                                                d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m5.5 3a.5.5 0 0 1 0-1H16v1zM1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1z" />
-                                        </svg>
-                                        <span>Nonaktifkan</span>
-                                    </button>
-                                </form>
-                            @else
-                                {{-- Aktifkan --}}
-                                <form id="form-aktifkan-{{ $user->id }}"
-                                    action="{{ route('admin-layanan.aktifkan', $user->id) }}" method="POST"
-                                    class="inline">
-                                    @csrf @method('PUT')
-                                    <button type="button"
-                                        onclick="confirmAktifkan({{ $user->id }}, @js($user->name))"
-                                        class="{{ $btn }} border-emerald-200 text-emerald-700 hover:bg-emerald-50">
-                                        <svg class="{{ $svg }}" viewBox="0 0 16 16" fill="currentColor">
-                                            <path
-                                                d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm3.97-8.03a.75.75 0 0 0-1.06-1.06L7.477 9.354 5.53 7.408a.75.75 0 1 0-1.06 1.06L6.97 10.97l5-5z" />
-                                        </svg>
-                                        <span>Aktifkan</span>
-                                    </button>
-                                </form>
-                            @endif
+                                
+                            <form id="form-nonaktif-{{ $user->id }}"
+                                action="{{ route('admin-layanan.nonaktif', $user->id) }}" method="POST" class="inline">
+                                @csrf @method('PUT')
+                                <button type="button"
+                                    onclick="confirmNonaktif({{ $user->id }}, @js($user->name))"
+                                    class="{{ $btn }} border-rose-200 text-rose-700 hover:bg-rose-50">
+                                    <svg class="{{ $svg }}" viewBox="0 0 16 16" fill="currentColor">
+                                        <path
+                                            d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m5.5 3a.5.5 0 0 1 0-1H16v1zM1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1z" />
+                                    </svg>
+                                    <span>Nonaktifkan</span>
+                                </button>
+                            </form>
+                        @else
+                            <form id="form-aktifkan-{{ $user->id }}"
+                                action="{{ route('admin-layanan.aktifkan', $user->id) }}" method="POST"
+                                class="inline">
+                                @csrf @method('PUT')
+                                <button type="button"
+                                    onclick="confirmAktifkan({{ $user->id }}, @js($user->name))"
+                                    class="{{ $btn }} border-emerald-200 text-emerald-700 hover:bg-emerald-50">
+                                    <svg class="{{ $svg }}" viewBox="0 0 16 16" fill="currentColor">
+                                        <path
+                                            d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm3.97-8.03a.75.75 0 0 0-1.06-1.06L7.477 9.354 5.53 7.408a.75.75 0 1 0-1.06 1.06L6.97 10.97l5-5z" />
+                                    </svg>
+                                    <span>Aktifkan</span>
+                                </button>
+                            </form>
+            @endif --}}
                         </div>
                     </td>
 

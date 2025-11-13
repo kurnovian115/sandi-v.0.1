@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Pengaduan;
 use App\Models\PengaduanLog;
 use Illuminate\Http\Request;
+
 use App\Http\Requests\UPT\JawabanStoreRequest;
 
 class PengaduanMasukController extends Controller
@@ -13,20 +14,13 @@ class PengaduanMasukController extends Controller
      public function index(Request $request)
     {
         $user = $request->user();
-        // dd($user->layanan_id);
-        // default: tampilkan hanya "menunggu"
-        // $statuses = $request->boolean('show_disposisi')
-        //     [Pengaduan::STATUS_MENUNGGU, Pengaduan::STATUS_DISPOSISI]
-        //     : [Pengaduan::STATUS_MENUNGGU];
 
-        // UPT\DisposisiController@index
         $statuses = [
-            // Pengaduan::STATUS_MENUNGGU,
             Pengaduan::STATUS_DISPOSISI,
         ];
         $items = Pengaduan::query()
             ->where('unit_id', $user->unit_id)
-            ->where('admin_layanan_id', $user->layanan_id)
+            ->where('admin_layanan_id', $user->id)
             ->whereIn('status', $statuses)
             ->when($request->filled('q'), function ($q) use ($request) {
                 $s = $request->get('q');

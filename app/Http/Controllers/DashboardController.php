@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\JenisLayanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -29,11 +30,13 @@ class DashboardController extends Controller
 
         $unitId     = $request->input('unit_id');
         $kategoriId = $request->input('kategori_id');
+        $layananId = $request->input('layanan_id');
 
         // Base query dengan filter + prefix created_at biar tidak ambiguous
         $base = Pengaduan::query()
             ->when($unitId, fn($q) => $q->where('unit_id', $unitId))
             ->when($kategoriId, fn($q) => $q->where('kategori_id', $kategoriId))
+            ->when($layananId, fn($q)=> $q->where('jenis_layanan_id', $layananId))
             ->whereBetween('pengaduans.created_at', [$startDate, $endDate]);
 
         // -----------------------
@@ -49,25 +52,28 @@ class DashboardController extends Controller
         // -----------------------
         // Dropdown filters data
         // -----------------------
-        $upts     = Unit::orderBy('name')->get(['id','name']);
-        $kategori = KategoriPengaduan::orderBy('nama')->get(['id','nama']);
+        $upts     = Unit::orderBy('name')->get(['id','name']); 
+        // dd($upts);
+        // Unit::orderBy('name')->get(['id','name']);
+        $kategori = KategoriPengaduan::orderBy('id')->get(['id','nama']);
+        $layanans = JenisLayanan::orderBy('id')->get();
 
         // -----------------------
         // Latest (alias no_tiket -> kode) + prefix created_at
         // -----------------------
-$latest = (clone $base)
-    ->leftJoin('units', 'units.id', '=', 'pengaduans.unit_id')
-    ->orderByDesc('pengaduans.created_at')
-    ->select([
-        'pengaduans.id',
-        DB::raw('pengaduans.no_tiket as kode'),
-        'pengaduans.judul',
-        'pengaduans.status',
-        'pengaduans.created_at',
-        DB::raw('units.name as unit_nama'),
-    ])
-    ->paginate(7)              // <- ganti get() jadi paginate()
-    ->withQueryString();        // <- supaya filter di URL tetap kepasang
+        $latest = (clone $base)
+            ->leftJoin('units', 'units.id', '=', 'pengaduans.unit_id')
+            ->orderByDesc('pengaduans.created_at')
+            ->select([
+                'pengaduans.id',
+                DB::raw('pengaduans.no_tiket as kode'),
+                'pengaduans.judul',
+                'pengaduans.status',
+                'pengaduans.created_at',
+                DB::raw('units.name as unit_nama'),
+            ])
+        ->paginate(7)              // <- ganti get() jadi paginate()
+        ->withQueryString();        // <- supaya filter di URL tetap kepasang
 
 
         // -----------------------
@@ -146,7 +152,9 @@ $latest = (clone $base)
         // -----------------------
         // Donut: kategori pengaduan
         // -----------------------
+
         $catTmp = (clone $base)
+       
             ->leftJoin('kategori_pengaduan', 'kategori_pengaduan.id', '=', 'pengaduans.kategori_id')
             ->groupBy('kategori_pengaduan.nama')
             ->orderBy('kategori_pengaduan.nama')
@@ -154,26 +162,24 @@ $latest = (clone $base)
                 DB::raw('COALESCE(kategori_pengaduan.nama, "Tidak Diisi") as name'),
                 DB::raw('COUNT(pengaduans.id) as total'),
             ]);
+            
         $catLabels = $catTmp->pluck('name')->all();
         $catData   = $catTmp->pluck('total')->map(fn($v)=>(int)$v)->all();
-
+            
         return view('kanwil.beranda.index', [
             'title' => 'Beranda — Admin Kanwil',
             'stat' => $stat,
             'upts' => $upts,
             'kategori' => $kategori,
+            'layanans' => $layanans,
             'latest' => $latest,
-
             'trendMonthLabels' => $monthLabels,
             'trendDataByUnitMonthly' => $trendMonthlyByUnit,
             'trendUnits' => array_column($trendUnits, 'name'),
-
             'barLabels' => $barLabels,
             'barData'   => $barData,
-
             'pieLabels' => $pieLabels,
             'pieData'   => $pieData,
-
             'catLabels' => $catLabels,
             'catData'   => $catData,
         ]);

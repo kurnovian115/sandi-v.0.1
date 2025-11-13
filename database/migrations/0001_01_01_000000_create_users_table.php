@@ -29,6 +29,8 @@ return new class extends Migration
             $table->timestamp('last_login_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
+
+            $table->unique(['unit_id','layanan_id']); 
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -45,6 +47,8 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+        // mencegah dua user berbeda pakai layanan yang sama di unit yang sama
+ 
     }
 
     /**

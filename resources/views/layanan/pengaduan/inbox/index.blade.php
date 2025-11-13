@@ -88,7 +88,6 @@
                                             @else
                                                 {{ $row->status_label }}
                                             @endif
-
                                         </span>
                                     </td>
 

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UptController;
 use Illuminate\Support\Facades\Session;
@@ -37,26 +38,11 @@ Route::get('/', function () {
     return view('page.index');
 });
 
-//  Route::prefix('page')
-//     ->name('page.')
-//     ->group(function () {
-//          Route::get('/', fn() => view('page.index', ['title' => 'Sandi Jabar']))->name('page.index');
-//         // Route::get('/', [PengaduanController::class, 'create'])->name('create');
-//   });
-
 //Admin kanwil
 Route::middleware(['auth'])->group(function () {
-
-
-    //Admin Kanwil
-    // Route::get('/beranda', function () {
-    //     return view('beranda.default', ['title' => 'Beranda']);
-    // })->name('beranda');
-
-
-    Route::prefix('layanan/beranda')->middleware('can:layanan-or-upt-or-kanwil')->group(function () {
+        Route::prefix('layanan/beranda')->middleware('can:layanan-or-upt-or-kanwil')->group(function () {
         // Route::get('/', fn() => view('kanwil.beranda.index', ['title' => 'Beranda Kanwil']))->name('kanwil.beranda');
-         Route::get('/', [LayananDashboardController::class, 'index'])->name('index');
+        Route::get('/', [LayananDashboardController::class, 'index'])->name('index');
     });
 
     Route::prefix('layanan/pengaduan/inbox')
@@ -217,9 +203,17 @@ Route::get('lang/{locale}', function ($locale) {
     return redirect()->back();
 })->name('lang.switch');
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->middleware(['auth', 'verified'])->name('dashboard');
+ Route::get('/dashboard', function () {
+
+    $user = Auth::user();
+
+    return match ($user->role->name ?? '') {
+        'admin_kanwil'   => redirect('/kanwil/beranda'),
+        'admin_upt'      => redirect('/upt/beranda'),
+        'admin_layanan'  => redirect('/layanan/beranda'),
+    };
+    
+})->middleware(['auth', 'verified'])->name('dashboard');
 
     Route::middleware('auth')->group(function () {
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

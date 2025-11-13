@@ -67,7 +67,7 @@ class Pengaduan extends Model
     // Helper status
     // nilai di DB
     public const STATUS_MENUNGGU  = 'Menunggu';
-    public const STATUS_DISPOSISI = 'Disposisi_ke_layanan';
+    public const STATUS_DISPOSISI = 'Disposisi ke layanan';
     public const STATUS_SELESAI   = 'Selesai';
 
      // Label untuk tampilan

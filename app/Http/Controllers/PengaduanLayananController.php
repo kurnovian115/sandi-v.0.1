@@ -28,7 +28,7 @@ class PengaduanLayananController extends Controller
         $query = Pengaduan::query()
             ->with(['unit', 'kategori', 'jenisLayanan', 'latestLog'])
             ->where('unit_id', $user->unit_id)
-            ->where('admin_layanan_id', $user->admin_layanan_id);
+            ->where('admin_layanan_id', $user->id);
 
         // kunci filter di request agar tidak bisa diubah dari UI
         $request->merge([
