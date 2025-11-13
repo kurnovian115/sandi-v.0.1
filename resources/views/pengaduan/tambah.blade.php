@@ -50,7 +50,7 @@
     </nav>
     <!-- Konten utama -->
     <main class="relative z-10 pt-24 pb-12">
-        <div class="fixed left-4 bottom-6 z-50">
+        <div class="fixed right-4 bottom-6 z-50">
             <a href="{{ url('/') }}" role="button"
                 class="inline-flex items-center gap-3 px-4 py-2.5 rounded-full shadow-xl  bottom-6
             bg-gradient-to-r from-indigo-600 to-sky-500 text-white
