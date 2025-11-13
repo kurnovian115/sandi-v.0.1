@@ -50,17 +50,23 @@
     </nav>
     <!-- Konten utama -->
     <main class="relative z-10 pt-24 pb-12">
-        <div class="fixed left-2 bottom-0 pb-4 pointer-events-none">
-            <a href="{{ url('/') }}" role="button"
-                class="inline-flex items-center gap-3 px-4 py-2.5 rounded-full shadow-xl bg-gradient-to-r from-indigo-600 to-sky-500 text-white hover:brightness-110 hover:scale-105 transition-transform">
+        <!-- Letakkan ini langsung di bawah <body> (di luar container lain) -->
+        <div class="fixed left-2 bottom-0 z-50 pb-6 sm:left-2 sm:bottom-0"
+            style="padding-bottom: env(safe-area-inset-bottom);">
+            <a href="{{ url('/') }}" role="button" aria-label="Kembali ke Beranda"
+                class="inline-flex items-center gap-3 px-3 py-2.5 rounded-full shadow-xl bg-gradient-to-r from-indigo-600 to-sky-500 text-white hover:brightness-110 hover:scale-105 transform transitionfocus:outline-none focus:ring-2 focus:ring-indigo-300/60 active:scale-95">
+
+                <!-- Ikon selalu tampil -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 16 16"
                     aria-hidden="true">
                     <path d="M8 .5l6 5V15a1 1 0 0 1-1 1h-3v-4H6v4H3a1 1 0 0 1-1-1V5.5l6-5z" />
                 </svg>
-                Kembali ke Beranda
-                <!-- ikoKembali kn + teks -->
+
+                <!-- Teks hanya tampil di sm ke atas -->
+                <span class="hidden sm:inline font-medium">Kembali ke Beranda</span>
             </a>
         </div>
+
 
         <div class="max-w-3xl mx-auto px-4">
             <div class="rounded-2xl overflow-hidden shadow border border-slate-200 bg-white/95 backdrop-blur-sm">
