@@ -22,7 +22,7 @@
                         </span>
 
                         {{-- Nama UPT (lebih kecil juga) --}}
-                        @if (optional(Auth::user()->unit)->name)
+                        @if (optional(Auth::user()->name))
                             <span class="hidden md:inline-block text-xs text-blue-100/90 mt-0.5 leading-snug">
                                 {{ Str::limit(optional(Auth::user()->unit)->name, 42) }}
                             </span>
