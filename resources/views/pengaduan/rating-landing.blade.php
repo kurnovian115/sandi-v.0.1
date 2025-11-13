@@ -195,7 +195,7 @@
                     </div>
                 </div> --}}
 
-                <!-- Kontak -->
+                <!-- info -->
                 <div class="card-section">
                     <h2 class="text-sm font-semibold text-slate-700 mb-3">Informasi Pelapor <span
                             class="text-rose-500">*</span>
