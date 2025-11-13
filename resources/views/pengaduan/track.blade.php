@@ -11,6 +11,20 @@
 </head>
 
 <body class="relative min-h-screen bg-gray-900 overflow-x-hidden">
+    <a href="/"
+        class="fixed left-4 bottom-6 z-50 inline-flex items-center gap-3 px-4 py-2.5 rounded-full 
+          shadow-xl bg-linear-to-r from-indigo-600 to-sky-500 text-white 
+          hover:brightness-110 hover:scale-105 transition-transform"
+        aria-label="Kembali ke Halaman Utama">
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 16 16"
+            aria-hidden="true">
+            <path d="M8 .5l6 5V15a1 1 0 0 1-1 1h-3v-4H6v4H3a1 1 0 0 1-1-1V5.5l6-5z" />
+        </svg>
+
+        <span class="hidden sm:inline font-medium">Kembali ke Beranda</span>
+    </a>
+
     <!-- Background logo transparan + overlay gradasi putih lembut -->
     <div class="absolute inset-0 bg-linear-to-b from-white/90 via-white/95 to-white pointer-events-none"></div>
 
@@ -29,14 +43,14 @@
                         </svg>
                     </button>
 
-                    <a href="#" class="flex items-center gap-3">
+                    <a href="/" class="flex items-center gap-3">
                         <img src="/images/logo.png" alt="Logo SANDI JABAR" class="w-8 h-8 object-contain" />
                         <span class="text-white text-lg font-semibold">SANDI JABAR</span>
                     </a>
                 </div>
                 <!-- Tombol Lacak Tiket -->
                 <a href="{{ route('pengaduan.create') }}"
-                    class="inline-flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm transition">
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-sky-500  text-white text-sm font-medium shadow-sm hover:from-indigo-700 hover:to-sky-600 transition-all duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="bi bi-plus-lg" viewBox="0 0 16 16">
                         <path fill-rule="evenodd"
@@ -45,6 +59,8 @@
 
                     Tambah Pengaduan
                 </a>
+
+
             </div>
         </div>
     </nav>

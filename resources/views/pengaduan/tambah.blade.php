@@ -8,9 +8,27 @@
     <title>Sandi Jabar - Pengaduan</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
+    {{-- <a href="{{ url('/') }}" class="flex items-center gap-3">
+        <img src="/images/logo.png" alt="Logo SANDI JABAR" class="w-8 h-8 object-contain" />
+        <span class="text-white text-lg font-semibold">SANDI JABAR</span>
+    </a> --}}
 </head>
 
 <body class="relative min-h-screen bg-gray-900 overflow-x-hidden">
+    <a href="/"
+        class="fixed left-4 bottom-6 z-50 inline-flex items-center gap-3 px-4 py-2.5 rounded-full 
+          shadow-xl bg-linear-to-r from-indigo-600 to-sky-500 text-white 
+          hover:brightness-110 hover:scale-105 transition-transform"
+        aria-label="Kembali ke Halaman Utama">
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 16 16"
+            aria-hidden="true">
+            <path d="M8 .5l6 5V15a1 1 0 0 1-1 1h-3v-4H6v4H3a1 1 0 0 1-1-1V5.5l6-5z" />
+        </svg>
+
+        <span class="hidden sm:inline font-medium">Kembali ke Beranda</span>
+    </a>
+
     <!-- Background logo transparan + overlay gradasi putih lembut -->
     <div class="absolute inset-0 bg-linear-to-b from-white/90 via-white/95 to-white pointer-events-none"></div>
 
@@ -19,17 +37,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3">
-                    {{-- <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar"
-                        aria-controls="logo-sidebar" type="button"
-                        class="inline-flex items-center p-2 text-slate-200 rounded-lg sm:hidden hover:bg-blue-900/30 focus:outline-none focus:ring-2 focus:ring-blue-400/40">
-                        <span class="sr-only">Buka sidebar</span>
-                        <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                            <path clip-rule="evenodd" fill-rule="evenodd"
-                                d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z" />
-                        </svg>
-                    </button> --}}
-
-                    <a href="#" class="flex items-center gap-3">
+                    <a href="/" class="flex items-center gap-3">
                         <img src="/images/logo.png" alt="Logo SANDI JABAR" class="w-8 h-8 object-contain" />
                         <span class="text-white text-lg font-semibold">SANDI JABAR</span>
                     </a>
@@ -37,15 +45,17 @@
 
                 <!-- Tombol Lacak Tiket -->
                 <a href="{{ route('pengaduan.track') }}"
-                    class="inline-flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm transition">
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-sky-500  text-white text-sm font-medium shadow-sm hover:from-indigo-700 hover:to-sky-600 transition-all duration-200">
+
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="bi bi-search" viewBox="0 0 16 16">
                         <path
                             d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
                     </svg>
-
-                    Lacak Tiket
+                    <span>Lacak Tiket</span>
                 </a>
+
+
             </div>
         </div>
     </nav>
@@ -165,14 +175,15 @@
                             // cari record kategori yang isinya 'Lainnya' (case-insensitive)
                             $lainnyaModel = $kategoris->first(function ($it) use ($namaField) {
                                 return strcasecmp(trim($it->{$namaField} ?? ''), 'Lainnya') === 0 ||
-                                    strcasecmp(trim($it->{$namaField} ?? ''), 'Lainnya...') === 0;
+                                    strcasecmp(trim($it->{$namaField} ?? ''), 'Lainnya...') === 0 ||
+                                    strcasecmp(trim($it->{$namaField} ?? ''), 'Others') === 0;
                             });
 
                             // jika ketemu ambil ID-nya, kalau tidak -> null
                             $lainnyaId = $lainnyaModel?->id;
                         @endphp
 
-                        <div x-data="{ isOther: {{ old('kategori_id') == $lainnyaId ? 'true' : 'false' }} }" class="space-y-2">
+                        <div x-data="{ isOther: {{ old('kategori_id') == $lainnyaId ? 'true' : 'false' }} }">
                             <label class="block text-sm font-medium text-slate-700">{{ __('pengaduan.category') }}
                                 <span class="text-rose-500">*</span></label>
 

@@ -1,4 +1,16 @@
 <x-guest-layout>
+    <a href="/"
+        class="fixed left-4 bottom-6 z-50 inline-flex items-center gap-3 px-4 py-2.5 rounded-full 
+          shadow-xl bg-linear-to-r from-indigo-600 to-sky-500 text-white 
+          hover:brightness-110 hover:scale-105 transition-transform"
+        aria-label="Kembali ke Halaman Utama">
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M8 .5l6 5V15a1 1 0 0 1-1 1h-3v-4H6v4H3a1 1 0 0 1-1-1V5.5l6-5z" />
+        </svg>
+
+        <span class="hidden sm:inline font-medium">Kembali ke Beranda</span>
+    </a>
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
     <div class="mt-4 mb-4">
@@ -13,8 +25,8 @@
         {{-- NIP --}}
         <div>
             <x-input-label for="nip" :value="__('NIP')" />
-            <x-text-input id="nip" class="block mt-1 w-full" type="text" name="nip" :value="old('nip')" required
-                autofocus autocomplete="nip" inputmode="numeric" pattern="[0-9]*" maxlength="18"
+            <x-text-input id="nip" class="block mt-1 w-full" type="text" name="nip" :value="old('nip')"
+                required autofocus autocomplete="nip" inputmode="numeric" pattern="[0-9]*" maxlength="18"
                 oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
             <x-input-error :messages="$errors->get('nip')" class="mt-2" />
         </div>
