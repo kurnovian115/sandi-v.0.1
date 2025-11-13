@@ -50,11 +50,9 @@
     </nav>
     <!-- Konten utama -->
     <main class="relative z-10 pt-24 pb-12">
-        <div class="fixed right-2 bottom-6 z-50">
+        <div class="fixed right-2 bottom-0 z-50">
             <a href="{{ url('/') }}" role="button"
-                class="inline-flex items-center gap-3 px-4 py-2.5 rounded-full shadow-xl  bottom-6
-            bg-gradient-to-r from-indigo-600 to-sky-500 text-white
-            hover:brightness-110 hover:scale-105 transition-transform">
+                class="inline-flex items-center gap-3 px-4 py-2.5 rounded-full shadow-xl bg-gradient-to-r from-indigo-600 to-sky-500 text-white hover:brightness-110 hover:scale-105 transition-transform">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 16 16"
                     aria-hidden="true">
                     <path d="M8 .5l6 5V15a1 1 0 0 1-1 1h-3v-4H6v4H3a1 1 0 0 1-1-1V5.5l6-5z" />
@@ -351,7 +349,7 @@
 
 
     {{-- Alert global (Swal) --}}
-    @include('components.alert')
+    {{-- @include('components.alert') --}}
     {{-- <script>
         document.addEventListener('DOMContentLoaded', () => {
             const input = document.getElementById('bukti')
