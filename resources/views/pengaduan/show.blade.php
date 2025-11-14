@@ -44,8 +44,18 @@
                         </div>
 
                         <div class="p-4 border rounded-xl bg-slate-50">
+                            <p class="text-slate-500 text-xs">Admin UPT</p>
+                            <p class="font-medium">{{ optional($pengaduan->adminUpt)->name ?: '—' }}</p>
+                        </div>
+                        <div class="p-4 border rounded-xl bg-slate-50">
                             <p class="text-slate-500 text-xs">Jenis Layanan</p>
                             <p class="font-medium">{{ optional($pengaduan->jenisLayanan)->nama ?: '—' }}</p>
+                        </div>
+                        <div class="p-4 border rounded-xl bg-slate-50">
+                            <p class="text-slate-500 text-xs">Layanan / User Disposisi</p>
+                            <p class="font-medium">
+                                {{ optional(optional($pengaduan->adminLayanan)->layanan)->nama ?: '—' }} /
+                                {{ optional($pengaduan->adminLayanan)->name ?: '—' }}</p>
                         </div>
 
                         <div class="p-4 border rounded-xl bg-slate-50">
@@ -61,7 +71,7 @@
                         </div>
 
                         <div class="p-4 border rounded-xl bg-slate-50">
-                            <p class="text-slate-500 text-xs">Dibuat Pada</p>
+                            <p class="text-slate-500 text-xs">Tanggal Pengaduan</p>
                             <p class="font-medium">{{ optional($pengaduan->created_at)->format('d M Y H:i') }}</p>
                         </div>
                     </div>

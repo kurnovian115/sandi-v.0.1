@@ -2,8 +2,14 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Unit;
 
+use App\Models\JenisLayanan;
+use Illuminate\Http\Request;
+use App\Models\PositiveReview;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\RateLimiter;
 
 class StorePositiveReviewRequest extends FormRequest
@@ -28,12 +34,17 @@ class StorePositiveReviewRequest extends FormRequest
             'pelapor_contact'   => 'required|string|max:20',
             'email'             => 'required|email|max:255',
             'jenis_layanan_id'  => 'required|exists:jenis_layanan,id',
+            'upt_id'            => 'required|integer|exists:units,id', // sesuaikan table/model (units/upts)
+            // 'jenis_layanan_id'  => 'required|integer|exists:jenis_layanans,id',
             'rating'            => 'required|integer|min:1|max:5',
             'note'              => 'nullable|string|max:2000',
             'upt_id'            => 'required|exists:units,id',
             'hp_field' => 'prohibited',  
         ];
     }
+
+   
+
 
     // public function withValidator($validator)
     // {

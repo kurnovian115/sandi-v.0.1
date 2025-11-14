@@ -58,101 +58,101 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('layanan/beranda')->middleware('can:layanan-or-upt-or-kanwil')->group(function () {
         // Route::get('/', fn() => view('kanwil.beranda.index', ['title' => 'Beranda Kanwil']))->name('kanwil.beranda');
         Route::get('/', [LayananDashboardController::class, 'index'])->name('index');
-    });
+        });
 
-    Route::prefix('layanan/pengaduan/inbox')
-        ->name('layanan.pengaduan.inbox.')
-        ->middleware('can:layanan-or-upt-or-kanwil')
+        Route::prefix('layanan/pengaduan/inbox')
+            ->name('layanan.pengaduan.inbox.')
+            ->middleware('can:layanan-or-upt-or-kanwil')
+            ->group(function () {
+                Route::get('/', [PengaduanMasukController::class, 'index'])->name('index');  
+                Route::post('/{pengaduan}/jawab', [PengaduanMasukController::class, 'jawab'])->name('jawab');
+                Route::get('/{pengaduan}', [PengaduanMasukController::class, 'show'])->name('show');
+        });
+
+        Route::prefix('layanan/pengaduan')
+            ->name('layanan.pengaduan.')
+            ->middleware('can:layanan-or-upt-or-kanwil')
+            ->group(function () {
+                Route::get('/', [PengaduanLayananController::class, 'index'])->name('index');  
+                Route::get('/{pengaduan}', [PengaduanLayananController::class, 'show'])->name('show');  
+        });
+
+        //   Route::prefix('kanwil/beranda')->middleware('can:kanwil-only')->group(function () {
+        //     // Route::get('/', fn() => view('kanwil.beranda.index', ['title' => 'Beranda Kanwil']))->name('kanwil.beranda');
+        //      Route::get('/', [DashboardController::class, 'index'])->name('index');
+        // });
+
+        Route::prefix('kanwil/beranda')->middleware('can:kanwil-only')->group(function () {
+            // Route::get('/', fn() => view('kanwil.beranda.index', ['title' => 'Beranda Kanwil']))->name('kanwil.beranda');
+            Route::get('/', [DashboardController::class, 'index'])->name('index');
+        });
+
+        Route::prefix('kanwil/monitoring')
+        -> name('kanwil.monitoring.')
+        -> middleware('can:kanwil-only')->group(function () {
+            // Route::get('/', fn() => view('kanwil.beranda.index', ['title' => 'Beranda Kanwil']))->name('kanwil.beranda');
+            Route::get('/', [KanwilPengaduanController::class, 'index'])->name('index');
+        });
+
+
+
+        Route::prefix('kanwil/upt')
+        ->name('kanwil.upt.')                 // <-- TAMBAH INI
+        ->middleware(['auth','can:kanwil-only'])
         ->group(function () {
-            Route::get('/', [PengaduanMasukController::class, 'index'])->name('index');  
-            Route::post('/{pengaduan}/jawab', [PengaduanMasukController::class, 'jawab'])->name('jawab');
-            Route::get('/{pengaduan}', [PengaduanMasukController::class, 'show'])->name('show');
-    });
+            Route::get('/',       [UptController::class, 'index'])->name('index');
+            Route::get('/tambah', [UptController::class, 'create'])->name('create');
+            Route::post('/tambah',[UptController::class, 'store'])->name('store');
+            Route::get('/{id}', [UptController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [UptController::class, 'edit'])->name('edit');
+            Route::put('/{id}',       [UptController::class, 'update'])->name('update');
+            Route::put('{id}/nonaktif', [UptController::class, 'nonaktif'])->name('nonaktif');
+            Route::put('{id}/aktifkan', [UptController::class, 'aktifkan'])->name('aktifkan');
+        });
 
-    Route::prefix('layanan/pengaduan')
-        ->name('layanan.pengaduan.')
-        ->middleware('can:layanan-or-upt-or-kanwil')
+        Route::prefix('kanwil/users/admin-upt')
+        ->name('kanwil.users.admin-upt.')                 // <-- TAMBAH INI
+        ->middleware(['auth','can:kanwil-only'])
         ->group(function () {
-            Route::get('/', [PengaduanLayananController::class, 'index'])->name('index');  
-            Route::get('/{pengaduan}', [PengaduanLayananController::class, 'show'])->name('show');  
-    });
+            Route::get('/',              [AdminUptController::class, 'index'])->name('index');
+            Route::get('/tambah',        [AdminUptController::class, 'create'])->name('create'); // jika butuh halaman sendiri
+            Route::post('/tambah',        [AdminUptController::class, 'store'])->name('store');
+            Route::get('/{id}',          [AdminUptController::class, 'show'])->name('show');     // opsional
+            Route::get('/{id}/edit',     [AdminUptController::class, 'edit'])->name('edit');
+            Route::put('/{id}',          [AdminUptController::class, 'update'])->name('update');
+            Route::put('/{id}/nonaktif', [AdminUptController::class, 'nonaktif'])->name('nonaktif');
+            Route::put('/{id}/aktifkan', [AdminUptController::class, 'aktifkan'])->name('aktifkan');
+        });
 
-    //   Route::prefix('kanwil/beranda')->middleware('can:kanwil-only')->group(function () {
-    //     // Route::get('/', fn() => view('kanwil.beranda.index', ['title' => 'Beranda Kanwil']))->name('kanwil.beranda');
-    //      Route::get('/', [DashboardController::class, 'index'])->name('index');
-    // });
+        Route::prefix('jenis-layanan')
+        ->name('jenis-layanan.')                 // <-- TAMBAH INI
+        ->middleware(['auth','can:upt-or-kanwil'])
+        ->group(function () {
+            Route::get('/', [JenisLayananController::class, 'index'])->name('index');
+            Route::get('/tambah', [JenisLayananController::class, 'create'])->name('create');
+            Route::post('/tambah', [JenisLayananController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [JenisLayananController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [JenisLayananController::class, 'update'])->name('update');
+            Route::delete('/{id}', [JenisLayananController::class, 'destroy'])->name('destroy');
+            Route::put('/{id}/nonaktif', [JenisLayananController::class, 'nonaktif'])->name('nonaktif');
+            Route::put('/{id}/aktifkan', [JenisLayananController::class, 'aktifkan'])->name('aktifkan');
+        });
 
-    Route::prefix('kanwil/beranda')->middleware('can:kanwil-only')->group(function () {
-        // Route::get('/', fn() => view('kanwil.beranda.index', ['title' => 'Beranda Kanwil']))->name('kanwil.beranda');
-         Route::get('/', [DashboardController::class, 'index'])->name('index');
-    });
+        Route::prefix('kategori-pengaduan')
+        ->name('kategori-pengaduan.')
+        ->middleware(['auth','can:upt-or-kanwil'])   // sesuaikan
+        ->group(function () {
+            Route::get('/', [KategoriPengaduanController::class,'index'])->name('index');
+            Route::get('/tambah', [KategoriPengaduanController::class,'create'])->name('tambah');
+            Route::post('/tambah', [KategoriPengaduanController::class,'store'])->name('store');
+            Route::get('/{id}/edit', [KategoriPengaduanController::class,'edit'])->name('edit');
+            Route::put('/{id}', [KategoriPengaduanController::class,'update'])->name('update');
+            Route::delete('/{id}', [KategoriPengaduanController::class,'destroy'])->name('destroy');
+            Route::patch('/{id}/toggle', [KategoriPengaduanController::class,'toggle'])->name('toggle');
+        });
 
-      Route::prefix('kanwil/monitoring')
-      -> name('kanwil.monitoring.')
-      -> middleware('can:kanwil-only')->group(function () {
-        // Route::get('/', fn() => view('kanwil.beranda.index', ['title' => 'Beranda Kanwil']))->name('kanwil.beranda');
-         Route::get('/', [KanwilPengaduanController::class, 'index'])->name('index');
-    });
-
-
-
-    Route::prefix('kanwil/upt')
-    ->name('kanwil.upt.')                 // <-- TAMBAH INI
-    ->middleware(['auth','can:kanwil-only'])
-    ->group(function () {
-        Route::get('/',       [UptController::class, 'index'])->name('index');
-        Route::get('/tambah', [UptController::class, 'create'])->name('create');
-        Route::post('/tambah',[UptController::class, 'store'])->name('store');
-        Route::get('/{id}', [UptController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [UptController::class, 'edit'])->name('edit');
-        Route::put('/{id}',       [UptController::class, 'update'])->name('update');
-        Route::put('{id}/nonaktif', [UptController::class, 'nonaktif'])->name('nonaktif');
-        Route::put('{id}/aktifkan', [UptController::class, 'aktifkan'])->name('aktifkan');
-    });
-
-    Route::prefix('kanwil/users/admin-upt')
-    ->name('kanwil.users.admin-upt.')                 // <-- TAMBAH INI
-    ->middleware(['auth','can:kanwil-only'])
-    ->group(function () {
-        Route::get('/',              [AdminUptController::class, 'index'])->name('index');
-        Route::get('/tambah',        [AdminUptController::class, 'create'])->name('create'); // jika butuh halaman sendiri
-        Route::post('/tambah',        [AdminUptController::class, 'store'])->name('store');
-        Route::get('/{id}',          [AdminUptController::class, 'show'])->name('show');     // opsional
-        Route::get('/{id}/edit',     [AdminUptController::class, 'edit'])->name('edit');
-        Route::put('/{id}',          [AdminUptController::class, 'update'])->name('update');
-        Route::put('/{id}/nonaktif', [AdminUptController::class, 'nonaktif'])->name('nonaktif');
-        Route::put('/{id}/aktifkan', [AdminUptController::class, 'aktifkan'])->name('aktifkan');
-    });
-
-    Route::prefix('jenis-layanan')
-    ->name('jenis-layanan.')                 // <-- TAMBAH INI
-    ->middleware(['auth','can:upt-or-kanwil'])
-    ->group(function () {
-        Route::get('/', [JenisLayananController::class, 'index'])->name('index');
-        Route::get('/tambah', [JenisLayananController::class, 'create'])->name('create');
-        Route::post('/tambah', [JenisLayananController::class, 'store'])->name('store');
-        Route::get('/{id}/edit', [JenisLayananController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [JenisLayananController::class, 'update'])->name('update');
-        Route::delete('/{id}', [JenisLayananController::class, 'destroy'])->name('destroy');
-        Route::put('/{id}/nonaktif', [JenisLayananController::class, 'nonaktif'])->name('nonaktif');
-        Route::put('/{id}/aktifkan', [JenisLayananController::class, 'aktifkan'])->name('aktifkan');
-    });
-
-    Route::prefix('kategori-pengaduan')
-    ->name('kategori-pengaduan.')
-    ->middleware(['auth','can:upt-or-kanwil'])   // sesuaikan
-    ->group(function () {
-        Route::get('/', [KategoriPengaduanController::class,'index'])->name('index');
-        Route::get('/tambah', [KategoriPengaduanController::class,'create'])->name('tambah');
-        Route::post('/tambah', [KategoriPengaduanController::class,'store'])->name('store');
-        Route::get('/{id}/edit', [KategoriPengaduanController::class,'edit'])->name('edit');
-        Route::put('/{id}', [KategoriPengaduanController::class,'update'])->name('update');
-        Route::delete('/{id}', [KategoriPengaduanController::class,'destroy'])->name('destroy');
-        Route::patch('/{id}/toggle', [KategoriPengaduanController::class,'toggle'])->name('toggle');
-    });
-
-   // admin UPT
-    Route::prefix('upt/beranda')
+        // admin UPT
+        Route::prefix('upt/beranda')
         ->name('upt.beranda.')
         ->middleware('can:upt-only')
         ->group(function () {
@@ -168,6 +168,17 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{pengaduan}/recall', [DisposisiController::class, 'recall'])->name('recall'); // tarik kembali
             Route::post('/{pengaduan}/jawab', [DisposisiController::class, 'jawab'])->name('jawab'); // jawab & tutup
             Route::get('/{pengaduan}', [DisposisiController::class, 'show'])->name('show');
+        });
+
+        Route::prefix('upt/apresiasi')
+        ->name('upt.apresiasi.')
+        ->middleware('can:upt-or-kanwil')
+        ->group(function () {
+            Route::get('/', [PositiveReviewController::class, 'index'])->name('index');
+            // Route::post('/{pengaduan}', [DisposisiController::class, 'store'])->name('store'); // disposisi ke user_layanan
+            // Route::post('/{pengaduan}/recall', [DisposisiController::class, 'recall'])->name('recall'); // tarik kembali
+            // Route::post('/{pengaduan}/jawab', [DisposisiController::class, 'jawab'])->name('jawab'); // jawab & tutup
+            // Route::get('/{pengaduan}', [DisposisiController::class, 'show'])->name('show');
         });
     });
   
