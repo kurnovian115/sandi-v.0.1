@@ -177,22 +177,26 @@
                             <tbody>
                                 @forelse($docs as $i => $file)
                                     @php
-                                        $path = is_array($file) ? $file['path'] ?? ($file['url'] ?? null) : $file;
-                                        $name = is_array($file)
-                                            ? $file['name'] ?? (is_string($path) ? basename($path) : 'file')
-                                            : (is_string($path)
-                                                ? basename($path)
-                                                : 'file');
-                                        $href = $path
-                                            ? (\Illuminate\Support\Str::startsWith($path, [
-                                                'http://',
-                                                'https://',
-                                                '/storage/',
-                                            ])
-                                                ? $path
-                                                : Storage::url($path))
-                                            : null;
+                                        // Ambil path dari DB
+                                        $path = is_array($file) ? $file['path'] ?? null : $file;
+
+                                        // Nama file
+                                        $name = is_array($file) ? $file['name'] ?? basename($path) : basename($path);
+
+                                        // Jika path sudah URL penuh (http/https), pakai apa adanya
+                                        if ($path && Str::startsWith($path, ['http://', 'https://'])) {
+                                            $href = $path;
+                                        }
+                                        // Jika path lokal → bentuk manual
+                                        elseif ($path) {
+                                            // pastikan path tidak diawali slash
+                                            $cleanPath = ltrim($path, '/');
+                                            $href = rtrim(env('APP_URL'), '/') . '/storage/' . $cleanPath;
+                                        } else {
+                                            $href = null;
+                                        }
                                     @endphp
+
                                     <tr class="border-b last:border-0">
                                         <td class="py-3 px-3">{{ $i + 1 }}</td>
                                         <td class="py-3 px-3">{{ $name }}</td>
