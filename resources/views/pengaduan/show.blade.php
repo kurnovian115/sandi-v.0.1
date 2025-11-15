@@ -53,7 +53,7 @@
                         </div>
 
                         <div class="p-4 border rounded-xl bg-slate-50">
-                            <p class="text-slate-500 text-xs">Layanan / User Disposisi</p>
+                            <p class="text-slate-500 text-xs">Disposis Layanan / User Disposisi</p>
 
                             <div class="flex items-center gap-1">
                                 <p class="font-medium">
