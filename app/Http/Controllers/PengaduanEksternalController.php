@@ -81,7 +81,7 @@ class PengaduanEksternalController extends Controller
         $paths = [];
         if ($request->hasFile('bukti_masyarakat')) {
             foreach ($request->file('bukti_masyarakat') as $f) {
-                if ($f) $paths[] = $f->store('pengaduan/bukti', 'public');
+                $paths[] = $f->store('pengaduan/bukti', config('filesystems.default_public_disk'));
             }
         }
         if ($paths) $validated['bukti_masyarakat'] = $paths;

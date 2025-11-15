@@ -9,13 +9,14 @@ use Illuminate\Support\Str;
 use App\Models\JenisLayanan;
 use App\Models\PengaduanLog;
 use Illuminate\Http\Request;
+use App\Mail\TicketCreatedMail;
 use App\Models\KategoriPengaduan;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\StorePengaduanRequest;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\TicketCreatedMail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\StorePengaduanRequest;
 
 class PengaduanController extends Controller
 {
@@ -271,105 +272,114 @@ class PengaduanController extends Controller
     //     }
     // }
 
-    public function store(StorePengaduanRequest $request)
-    {
-        // gunakan validated() dari StorePengaduanRequest
-        $validated = $request->validated();
+ public function store(StorePengaduanRequest $request)
+{
+    $validated = $request->validated();
 
-        // Map upt_id -> unit_id
-        $validated['unit_id'] = $validated['upt_id'] ?? null;
-        unset($validated['upt_id']);
+    // Map upt_id -> unit_id
+    $validated['unit_id'] = $validated['upt_id'] ?? null;
+    unset($validated['upt_id']);
 
-        DB::beginTransaction();
+    DB::beginTransaction();
 
-        try {
-            // generate tiket
-            $noTiket = 'IMI-JBR-' . now()->format('YmdHis') . strtoupper(Str::random(3));
+    try {
+        // generate tiket
+        $noTiket = 'IMI-JBR-' . now()->format('YmdHis') . strtoupper(Str::random(3));
 
-            $data = $validated;
-            $data['no_tiket'] = $noTiket;
-            $data['status'] = 'Menunggu';
-            $data['sla_late'] = 0;
+        $data = $validated;
+        $data['no_tiket'] = $noTiket;
+        $data['status'] = 'Menunggu';
+        $data['sla_late'] = 0;
 
-            // handle files (safely)
-            $buktiArray = [];
-            if ($request->hasFile('bukti_masyarakat')) {
-                foreach ($request->file('bukti_masyarakat') as $f) {
-                    // optional: cek isValid()
-                    if (! $f->isValid()) continue;
-                    $path = $f->store('pengaduan/bukti/' . date('Ymd'), 'public');
-                    $buktiArray[] = [
-                        'path' => $path,
-                        'name' => $f->getClientOriginalName(),
-                        'mime' => $f->getClientMimeType(),
-                        'size' => $f->getSize(),
-                    ];
-                }
-            }
-            $data['bukti_masyarakat'] = $buktiArray ?: null;
+        // handle files (safely) -> simpan ke disk 'upload_disk'
+        $buktiArray = [];
 
-            // create pengaduan
-            $pengaduan = Pengaduan::create($data);
-
-            // initial log
-            PengaduanLog::create([
-                'pengaduan_id' => $pengaduan->id,
-                'user_id' => null,
-                'type' => 'create',
-                'status_after' => $pengaduan->status,
-                'note' => 'Pengaduan dibuat oleh masyarakat publik / Complaints are made by the public.',
-                'meta' => [
-                    'pelapor_nama' => $pengaduan->pelapor_nama ?? null,
-                    'pelapor_contact' => $pengaduan->pelapor_contact ?? null,
-                ],
-            ]);
-
-            DB::commit();
-
-            // --- Kirim email (TIDAK merollback DB jika gagal)
-            if (!empty($pengaduan->email)) {
-                try {
-                    // Prefer queue in production:
-                    // Mail::to($pengaduan->email)->queue(new TicketCreatedMail($pengaduan));
-
-                    // If you do not use queue, use send() but wrap with try/catch:
-                    Mail::to($pengaduan->email)->send(new TicketCreatedMail($pengaduan));
-                    Log::info('Ticket email sent', ['pengaduan_id' => $pengaduan->id, 'email' => $pengaduan->email]);
-                } catch (\Throwable $mailEx) {
-                    // log error but DO NOT rollback DB
-                    Log::error('Failed to send ticket email', [
-                        'pengaduan_id' => $pengaduan->id,
-                        'email' => $pengaduan->email,
-                        'error' => $mailEx->getMessage(),
-                        'trace' => $mailEx->getTraceAsString(),
-                    ]);
-                    // optionally: notify admin, or push to a failed-mails table
-                }
+        if ($request->hasFile('bukti_masyarakat')) {
+            // normalisasi: bisa single file atau array
+            $files = $request->file('bukti_masyarakat');
+            if (!is_array($files)) {
+                $files = [$files];
             }
 
-            // redirect with structured session (ticket + email)
-            return redirect()->route('pengaduan.create')->with([
-                'ticket' => $noTiket,
-                'email'  => $pengaduan->email,
-                'success_message' => true,
-            ]);
-        } catch (\Throwable $e) {
-            DB::rollBack();
+            foreach ($files as $f) {
+                if (! $f || ! $f->isValid()) continue;
 
-            // log full error
-            Log::error('Failed to create pengaduan', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'request' => [
-                    // avoid logging sensitive data
-                    'upt_id' => $request->input('upt_id'),
-                    'kategori_id' => $request->input('kategori_id'),
-                ],
-            ]);
+                // direktori tujuan di dalam disk
+                $dir = 'pengaduan/bukti/' . date('Ymd');
 
-            return back()->withInput()->withErrors(['internal' => 'Terjadi kesalahan. Silakan ulangi.']);
+                // simpan file ke disk 'upload_disk'
+                // menggunakan store() agar nama file unik dibuat oleh laravel
+                $path = $f->store($dir, config('filesystems.default_public_disk')); // <-- DISK yang kamu definisikan
+
+                // optional: jika mau url publik yang dikonfigurasi di upload_disk
+                // Storage::disk('upload_disk')->url($path) akan mengembalikan url sesuai konfigurasi 'url' di filesystem
+                $publicUrl = env('APP_URL') . '/storage/' . $path;
+                $buktiArray[] = [
+                    'path' => $path, // path relatif terhadap root disk
+                    'url'  => $publicUrl, // bisa null jika disk tidak mendukung url()
+                    'name' => $f->getClientOriginalName(),
+                    'mime' => $f->getClientMimeType(),
+                    'size' => $f->getSize(),
+                ];
+            }
         }
+
+        $data['bukti_masyarakat'] = $buktiArray ?: null;
+
+        // create pengaduan
+        $pengaduan = Pengaduan::create($data);
+
+        // initial log
+        PengaduanLog::create([
+            'pengaduan_id' => $pengaduan->id,
+            'user_id' => null,
+            'type' => 'create',
+            'status_after' => $pengaduan->status,
+            'note' => 'Pengaduan dibuat oleh masyarakat publik / Complaints are made by the public.',
+            'meta' => [
+                'pelapor_nama' => $pengaduan->pelapor_nama ?? null,
+                'pelapor_contact' => $pengaduan->pelapor_contact ?? null,
+            ],
+        ]);
+
+        DB::commit();
+
+        // --- Kirim email (TIDAK merollback DB jika gagal)
+        if (!empty($pengaduan->email)) {
+            try {
+                Mail::to($pengaduan->email)->send(new TicketCreatedMail($pengaduan));
+                Log::info('Ticket email sent', ['pengaduan_id' => $pengaduan->id, 'email' => $pengaduan->email]);
+            } catch (\Throwable $mailEx) {
+                Log::error('Failed to send ticket email', [
+                    'pengaduan_id' => $pengaduan->id,
+                    'email' => $pengaduan->email,
+                    'error' => $mailEx->getMessage(),
+                    'trace' => $mailEx->getTraceAsString(),
+                ]);
+            }
+        }
+
+        return redirect()->route('pengaduan.create')->with([
+            'ticket' => $noTiket,
+            'email'  => $pengaduan->email,
+            'success_message' => true,
+        ]);
+    } catch (\Throwable $e) {
+        DB::rollBack();
+
+        Log::error('Failed to create pengaduan', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'request' => [
+                'upt_id' => $request->input('upt_id'),
+                'kategori_id' => $request->input('kategori_id'),
+            ],
+        ]);
+
+        return back()->withInput()->withErrors(['internal' => 'Terjadi kesalahan. Silakan ulangi.']);
     }
+}
+
 
     
     public function track(Request $request)

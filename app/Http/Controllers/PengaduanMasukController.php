@@ -7,9 +7,10 @@ use App\Models\Pengaduan;
 use App\Models\PengaduanLog;
 use Illuminate\Http\Request;
 
-use Illuminate\Support\Facades\Log;
 use App\Mail\PengaduanAnsweredMail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UPT\JawabanStoreRequest;
 
 class PengaduanMasukController extends Controller
@@ -90,15 +91,28 @@ class PengaduanMasukController extends Controller
         }
 
         $path = null;
+        $publicUrl = null;
+
         if ($request->hasFile('dokumen_penyelesaian')) {
-            $path = $request->file('dokumen_penyelesaian')->store('pengaduan/dokumen','public');
+            $file = $request->file('dokumen_penyelesaian');
+
+            if ($file && $file->isValid()) {
+                // simpan ke disk custom 'upload_disk'
+                $path = $file->store('pengaduan/dokumen', 'upload_disk');
+
+                // optional: dapatkan url publik jika disk mendukungnya
+                $publicUrl = env('APP_URL') . '/storage/' . $path;
+            }
         }
 
         $pengaduan->update([
             'admin_upt_id' => $request->user()->id,
             'hasil_tindaklanjut' => $request->hasil_tindaklanjut,
             'petugas_nama' => $request->petugas_nama,
+            // tetap pakai value lama jika tidak ada upload baru
             'dokumen_penyelesaian' => $path ?? $pengaduan->dokumen_penyelesaian,
+            // jika kamu mau menyimpan url juga, bisa tambah field 'dokumen_penyelesaian_url' di migration
+            // 'dokumen_penyelesaian_url' => $publicUrl ?? $pengaduan->dokumen_penyelesaian_url,
             'status' => Pengaduan::STATUS_SELESAI,
             'tanggal_selesai' => now(),
         ]);
@@ -112,34 +126,26 @@ class PengaduanMasukController extends Controller
             'meta' => null,
         ]);
 
-        // KIRIM EMAIL NOTIFIKASI KE PELAPOR (jika email ada)
-        // dd($pengaduan->email);
         try {
             if (!empty($pengaduan->email)) {
-                // Jika ingin memakai queue: ->queue(new PengaduanAnsweredMail($pengaduan));
                 Mail::to($pengaduan->email)->send(new PengaduanAnsweredMail($pengaduan));
-
                 Log::info('Pengaduan answered email sent', [
                     'pengaduan_id' => $pengaduan->id,
                     'email' => $pengaduan->email,
                 ]);
-                
             } else {
                 Log::info('Pengaduan answered: no email to send', ['pengaduan_id' => $pengaduan->id]);
             }
         } catch (\Throwable $mailEx) {
-            // log error, jangan ganggu UX petugas
             Log::error('Failed sending answered email', [
                 'pengaduan_id' => $pengaduan->id,
                 'email' => $pengaduan->email,
                 'error' => $mailEx->getMessage(),
             ]);
-            // optional: flash message to admin about mail fail (tidak wajib)
-            // session()->flash('warning', 'Notifikasi email gagal dikirim, silakan cek log.');
         }
 
         return back()->with('success', 'Pengaduan selesai dijawab.');
-    }
+}
 
 
     public function show(Request $request, Pengaduan $pengaduan)

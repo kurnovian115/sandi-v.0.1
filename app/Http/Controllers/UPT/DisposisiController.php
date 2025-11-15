@@ -9,11 +9,12 @@ use App\Models\PengaduanLog;
 use Illuminate\Http\Request;
 // use Illuminate\Support\Facades\Gate;
 use App\Mail\PengaduanAnsweredMail;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UPT\JawabanStoreRequest;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Log;
 
 class DisposisiController extends Controller
 {
@@ -118,67 +119,89 @@ class DisposisiController extends Controller
 
     public function jawab(JawabanStoreRequest $request, Pengaduan $pengaduan)
     {
-        // pastikan hanya admin_upt yg boleh menjawab untuk unit terkait
-        if (
-            optional($request->user()->role)->name !== 'admin_upt' ||
-            (int) $request->user()->unit_id !== (int) $pengaduan->unit_id
-        ) {
-            abort(403);
-        }
+    // pastikan hanya admin_upt yg boleh menjawab untuk unit terkait
+    if (
+        optional($request->user()->role)->name !== 'admin_upt' ||
+        (int) $request->user()->unit_id !== (int) $pengaduan->unit_id
+    ) {
+        abort(403);
+    }
 
-        $path = null;
-        if ($request->hasFile('dokumen_penyelesaian')) {
-            $path = $request->file('dokumen_penyelesaian')->store('pengaduan/dokumen', 'public');
-        }
+    $path = null;
+    $publicUrl = null;
 
-        // update data pengaduan
-        $pengaduan->update([
-            'admin_upt_id' => $request->user()->id,
-            'hasil_tindaklanjut' => $request->hasil_tindaklanjut,
-            'petugas_nama' => $request->petugas_nama,
-            // simpan path file (string) atau biarkan array sesuai struktur di modelmu
-            'dokumen_penyelesaian' => $path ?? $pengaduan->dokumen_penyelesaian,
-            'status' => Pengaduan::STATUS_SELESAI,
-            'tanggal_selesai' => now(),
-        ]);
+    if ($request->hasFile('dokumen_penyelesaian')) {
+        $file = $request->file('dokumen_penyelesaian');
 
-        // catat log
-        PengaduanLog::create([
-            'pengaduan_id' => $pengaduan->id,
-            'user_id' => $request->user()->id,
-            'type' => 'jawab',
-            'status_after' => Pengaduan::STATUS_SELESAI,
-            'note' => 'Ditutup oleh admin UPT',
-            'meta' => null,
-        ]);
+        if ($file && $file->isValid()) {
+            // simpan ke disk custom 'upload_disk'
+            $path = $file->store('pengaduan/dokumen', config('filesystems.default_public_disk'));
 
-        // ==== kirim notifikasi email ke pelapor (jika ada) ====
-        try {
-            if (!empty($pengaduan->email)) {
-                // synchronous send; jika nanti mau queue, ganti ->send() ke ->queue()
-                Mail::to($pengaduan->email)->send(new PengaduanAnsweredMail($pengaduan));
+            // buat URL publik manual (driver local)
+            $publicUrl = rtrim(env('APP_URL'), '/') . '/storage/' . ltrim($path, '/');
 
-                Log::info('Pengaduan answered email sent by admin_upt', [
-                    'pengaduan_id' => $pengaduan->id,
-                    'email' => $pengaduan->email,
-                    'admin_upt_id' => $request->user()->id,
-                ]);
-            } else {
-                Log::info('Pengaduan answered - no email', ['pengaduan_id' => $pengaduan->id]);
+            // optional: hapus file lama jika ada (aman-cek)
+            if (!empty($pengaduan->dokumen_penyelesaian) && Storage::disk(config('filesystems.default_public_disk'))->exists($pengaduan->dokumen_penyelesaian)) {
+                try {
+                    Storage::disk(config('filesystems.default_public_disk'))->delete($pengaduan->dokumen_penyelesaian);
+                } catch (\Throwable $delEx) {
+                    Log::warning('Failed to delete old dokumen_penyelesaian', [
+                        'old_path' => $pengaduan->dokumen_penyelesaian,
+                        'error' => $delEx->getMessage(),
+                    ]);
+                }
             }
-        } catch (\Throwable $mailEx) {
-            // JANGAN rollback DB - cukup log error agar bisa ditindaklanjuti
-            Log::error('Failed sending answered email (admin_upt)', [
+        }
+    }
+
+    // update data pengaduan
+    $pengaduan->update([
+        'admin_upt_id' => $request->user()->id,
+        'hasil_tindaklanjut' => $request->hasil_tindaklanjut,
+        'petugas_nama' => $request->petugas_nama,
+        // simpan path file (string) — tetap gunakan path jika upload baru, atau biarkan apa yang ada
+        'dokumen_penyelesaian' => $path ?? $pengaduan->dokumen_penyelesaian,
+        // jika kamu punya kolom URL terpisah, simpan juga:
+        // 'dokumen_penyelesaian_url' => $publicUrl ?? $pengaduan->dokumen_penyelesaian_url,
+        'status' => Pengaduan::STATUS_SELESAI,
+        'tanggal_selesai' => now(),
+    ]);
+
+    // catat log
+    PengaduanLog::create([
+        'pengaduan_id' => $pengaduan->id,
+        'user_id' => $request->user()->id,
+        'type' => 'jawab',
+        'status_after' => Pengaduan::STATUS_SELESAI,
+        'note' => 'Ditutup oleh admin UPT',
+        'meta' => null,
+    ]);
+
+    // ==== kirim notifikasi email ke pelapor (jika ada) ====
+    try {
+        if (!empty($pengaduan->email)) {
+            // synchronous send; jika nanti mau queue, ganti ->send() ke ->queue()
+            Mail::to($pengaduan->email)->send(new PengaduanAnsweredMail($pengaduan));
+
+            Log::info('Pengaduan answered email sent by admin_upt', [
                 'pengaduan_id' => $pengaduan->id,
                 'email' => $pengaduan->email,
-                'error' => $mailEx->getMessage(),
+                'admin_upt_id' => $request->user()->id,
             ]);
-            // optional: flash warning to UI for admins:
-            // session()->flash('warning', 'Notifikasi email gagal dikirim. Silakan cek log.');
+        } else {
+            Log::info('Pengaduan answered - no email', ['pengaduan_id' => $pengaduan->id]);
         }
-
-        return back()->with('success', 'Pengaduan selesai dijawab.');
+    } catch (\Throwable $mailEx) {
+        // JANGAN rollback DB - cukup log error agar bisa ditindaklanjuti
+        Log::error('Failed sending answered email (admin_upt)', [
+            'pengaduan_id' => $pengaduan->id,
+            'email' => $pengaduan->email,
+            'error' => $mailEx->getMessage(),
+        ]);
     }
+
+    return back()->with('success', 'Pengaduan selesai dijawab.');
+}
 
 
     // Disposisikan ke user_layanan
