@@ -133,7 +133,8 @@
                                                 class="w-full h-full object-cover group-hover:opacity-80"
                                                 onerror="this.style.display='none'">
                                         </div>
-                                        <p class="text-xs mt-1 truncate">{{ $name }}</p>
+                                        {{--  {{ $name }} --}}
+                                        <p class="text-xs mt-1 truncate">Bukti Pendukung</p>
                                     </a>
                                 @else
                                     <div class="p-4 border rounded-xl bg-slate-50 text-xs text-slate-500">File tidak
@@ -199,7 +200,7 @@
 
                                     <tr class="border-b last:border-0">
                                         <td class="py-3 px-3">{{ $i + 1 }}</td>
-                                        <td class="py-3 px-3">{{ $name }}</td>
+                                        <td class="py-3 px-3">Dokumen Pendukung</td>
                                         <td class="py-3 px-3">
                                             @if ($href)
                                                 <a href="{{ $href }}" target="_blank"
