@@ -97,8 +97,8 @@
                         </div>
 
                         <div class="p-4 border rounded-xl bg-slate-50">
-                            <p class="text-slate-500 text-xs">No Handphone / Email</p>
-                            <p class="font-medium">{{ $pengaduan->pelapor_contact ?: '—' }} /
+                            <p class="text-slate-500 text-xs">Kontak (No Handphone / Nama Akun Eksternal | Email)</p>
+                            <p class="font-medium">{{ $pengaduan->pelapor_contact ?: '—' }} |
                                 {{ $pengaduan->email ?: '—' }}</p>
                         </div>
                     </div>
