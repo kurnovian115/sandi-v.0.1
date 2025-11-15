@@ -172,7 +172,7 @@
                     </div>
                     <div class="p-4 border rounded-xl bg-slate-50">
                         <p class="text-slate-500 text-xs">Hasil Tindak Lanjut</p>
-                        <p class="font-medium">{{ $pengaduan->hasil_tindaklanjut ?: '—' }}</p>
+                        <p class="text-xs">{{ $pengaduan->hasil_tindaklanjut ?: '—' }}</p>
                     </div>
 
                 </div>
