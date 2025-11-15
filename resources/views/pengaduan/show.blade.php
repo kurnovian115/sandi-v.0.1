@@ -51,14 +51,22 @@
                             <p class="text-slate-500 text-xs">Jenis Layanan</p>
                             <p class="font-medium">{{ optional($pengaduan->jenisLayanan)->nama ?: '—' }}</p>
                         </div>
+
                         <div class="p-4 border rounded-xl bg-slate-50">
                             <p class="text-slate-500 text-xs">Layanan / User Disposisi</p>
-                            <p class="font-medium">
-                                {{ optional(optional($pengaduan->adminLayanan)->layanan)->nama ?: '—' }} / </p>
-                            <p class="text-xs">
-                                {{ optional($pengaduan->adminLayanan)->nip ? 'NIP. ' . $pengaduan->adminLayanan->nip : '—' }}
-                                {{ optional($pengaduan->adminLayanan)->name ?: '—' }}</p>
+
+                            <div class="flex items-center gap-1">
+                                <p class="font-medium">
+                                    {{ optional(optional($pengaduan->adminLayanan)->layanan)->nama ?: '—' }} /
+                                </p>
+
+                                <p class="text-xs">
+                                    {{ optional($pengaduan->adminLayanan)->nip ? 'NIP. ' . $pengaduan->adminLayanan->nip : '—' }}
+                                    {{ optional($pengaduan->adminLayanan)->nama ?: '—' }}
+                                </p>
+                            </div>
                         </div>
+
 
                         <div class="p-4 border rounded-xl bg-slate-50">
                             <p class="text-slate-500 text-xs">Asal Pengaduan</p>
