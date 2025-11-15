@@ -62,7 +62,7 @@
 
                                 <p class="text-xs">
                                     {{ optional($pengaduan->adminLayanan)->nip ? 'NIP. ' . $pengaduan->adminLayanan->nip : '—' }}
-                                    {{ optional($pengaduan->adminLayanan)->nama ?: '—' }}
+                                    {{ optional($pengaduan->adminLayanan)->name ?: '—' }}
                                 </p>
                             </div>
                         </div>
