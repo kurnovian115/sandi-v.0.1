@@ -54,9 +54,10 @@
                         <div class="p-4 border rounded-xl bg-slate-50">
                             <p class="text-slate-500 text-xs">Layanan / User Disposisi</p>
                             <p class="font-medium">
-                                {{ optional(optional($pengaduan->adminLayanan)->layanan)->nama ?: '—' }} /
+                                {{ optional(optional($pengaduan->adminLayanan)->layanan)->nama ?: '—' }} / </p>
+                            <p class="text-xs">
                                 {{ optional($pengaduan->adminLayanan)->nip ? 'NIP. ' . $pengaduan->adminLayanan->nip : '—' }}
-                                {{ optional($pengaduan->adminLayanan)->nama ?: '—' }}</p>
+                                {{ optional($pengaduan->adminLayanan)->name ?: '—' }}</p>
                         </div>
 
                         <div class="p-4 border rounded-xl bg-slate-50">
