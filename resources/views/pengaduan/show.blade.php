@@ -146,6 +146,13 @@
                     </div>
                 </div>
 
+                <div>
+                    <h2 class="text-base font-semibold text-slate-700 mb-3">Hasil Tindak Lanjut</h2>
+                    <div class="p-4 border rounded-xl bg-slate-50 text-sm leading-relaxed whitespace-pre-line">
+                        {{ $pengaduan->hasil_tindaklanjut }}
+                    </div>
+                </div>
+
                 {{-- DOKUMEN PENYELESAIAN (table + unduh) --}}
                 @php
                     $docs = $pengaduan->dokumen_penyelesaian;
