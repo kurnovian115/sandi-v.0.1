@@ -55,7 +55,10 @@
                             <p class="text-slate-500 text-xs">Layanan / User Disposisi</p>
                             <p class="font-medium">
                                 {{ optional(optional($pengaduan->adminLayanan)->layanan)->nama ?: '—' }} /
-                                {{ optional($pengaduan->adminLayanan)->name ?: '—' }}</p>
+                                {{ $pengaduan->adminLayanan && $pengaduan->adminLayanan->nip && $pengaduan->adminLayanan->nama
+                                    ? $pengaduan->adminLayanan->nip . ' - ' . $pengaduan->adminLayanan->nama
+                                    : '—' }}
+                            </p>
                         </div>
 
                         <div class="p-4 border rounded-xl bg-slate-50">
@@ -148,10 +151,23 @@
                 </div>
 
                 <div>
-                    <h2 class="text-base font-semibold text-slate-700 mb-3">Hasil Tindak Lanjut</h2>
+                    <h2 class="text-base font-semibold text-slate-700 mb-3">Petugas Yang Menindak Lanjuti</h2>
                     <div class="p-4 border rounded-xl bg-slate-50 text-sm leading-relaxed whitespace-pre-line">
-                        {{ $pengaduan->hasil_tindaklanjut }}
+                        {{ $pengaduan->petugas_nama }}
                     </div>
+                </div>
+
+                <div>
+                    <h2 class="text-base font-semibold text-slate-700 mb-3">Penyelesaian</h2>
+                    <div class="p-4 border rounded-xl bg-slate-50 mb-3">
+                        <p class="text-slate-500 text-xs">Petugas Yang Menindak Lanjuti</p>
+                        <p class="font-medium">{{ $pengaduan->petugas_nama ?: '—' }}</p>
+                    </div>
+                    <div class="p-4 border rounded-xl bg-slate-50">
+                        <p class="text-slate-500 text-xs">Hasil Tindak Lanjut</p>
+                        <p class="font-medium">{{ $pengaduan->hasil_tindaklanjut ?: '—' }}</p>
+                    </div>
+
                 </div>
 
                 {{-- DOKUMEN PENYELESAIAN (table + unduh) --}}
@@ -245,7 +261,8 @@
                                         <td class="py-3 px-3">
                                             {{ $log->aksi ?? ($log->action ?? ($log->tipe ?? ($log->type ?? '—'))) }}
                                         </td>
-                                        <td class="py-3 px-3">{{ $log->status_setelah ?? ($log->status_after ?? '—') }}
+                                        <td class="py-3 px-3">
+                                            {{ $log->status_setelah ?? ($log->status_after ?? '—') }}
                                         </td>
                                         <td class="py-3 px-3 whitespace-normal wrap-break-words max-w-md">
                                             {{ $log->catatan ?? ($log->note ?? '—') }}
