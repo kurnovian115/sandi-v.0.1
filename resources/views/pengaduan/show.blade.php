@@ -167,7 +167,7 @@
                 <div>
                     <h2 class="text-base font-semibold text-slate-700 mb-3">Penyelesaian</h2>
                     <div class="p-4 border rounded-xl bg-slate-50 mb-3">
-                        <p class="text-slate-500 text-xs">Petugas Yang Menindak Lanjuti</p>
+                        <p class="text-slate-500 text-xs font-semibold">Petugas Yang Menindak Lanjuti</p>
                         <p class="font-medium">{{ $pengaduan->petugas_nama ?: '—' }}</p>
                     </div>
                     <div class="p-4 border rounded-xl bg-slate-50">
